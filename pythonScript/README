@@ -15,12 +15,12 @@ J.K. Rowling spelled as "J. K. Rowling". Little inconsistencies like these may i
  copy of the books.csv file to stay consistent with what the professor has provided us. The script has been altered to
  reflect and account for this change, as it will now open "booksOG.csv", so keep that in mind.
 
-It is only formatted to parse through books.csv and not borrowers.csv as of 10/17.
+It is only formatted to parse through booksOG.csv and not borrowers.csv as of 10/17.
 
 The python file creates a text file named "insertSTMTS" but this can be changed to your liking.
 
-Be sure that books.csv and main.py are within the same folder when running main. A project folder in PyCharm is what I
+Be sure that booksOG.csv and main.py are within the same folder when running main. A project folder in PyCharm is what I
 used.
 
-This code works for me as of right now, 10/17, if you have any concerns on how to run or execute, let me know in
+This code works for me as of right now, 10/18, if you have any concerns on how to run or execute, let me know in
 discord, thank you.
