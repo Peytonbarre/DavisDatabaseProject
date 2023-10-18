@@ -1,4 +1,4 @@
-f = open('books.csv', 'r', encoding="utf-8")
+f = open('booksOG.csv', 'r', encoding="utf-8")
 f2 = open('insertSTMTS.txt', 'w', encoding="utf-8")
 
 book_list = list(f)
@@ -11,13 +11,13 @@ for line in book_list[0:]:
     book_array = line.split('\t')
     isbn = book_array[1]
     title = book_array[2]
-    f2.write("INSERT INTO Books VALUES (\"" + isbn + "\" , \"" + title + "\");\n")  # write out to a file and then run the file in sql database
+    f2.write("INSERT INTO Book VALUES (\"" + isbn + "\" , \"" + title + "\");\n")  # write out to a file and then run the file in sql database
     authors = book_array[3].split(',')  # author
     for auth in authors:
         if auth in author_dict:
             author_id = author_dict[auth]
-            f2.write(str("INSERT INTO Authors VALUES (\"" + str(author_id) + "\" , \"" + auth + "\");"))
-            f2.write("\n")
+            #f2.write(str("INSERT INTO Authors VALUES (\"" + str(author_id) + "\" , \"" + auth + "\");"))
+            #f2.write("\n")
             f2.write(str("INSERT INTO Book_Authors VALUES (\"" + str(author_id) + "\" , \"" + isbn + "\");"))
             f2.write("\n")
         else:

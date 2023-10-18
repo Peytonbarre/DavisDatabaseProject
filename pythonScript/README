@@ -10,6 +10,10 @@ id, then author's id gets used instead of assigning them a new one.
 of these errors. The errors are inconsistent spelling of names, such as: Mclaughlin spelled as McLaughlin and
 J.K. Rowling spelled as "J. K. Rowling". Little inconsistencies like these may impact how accurate the author's ids are,
  so keep that in mind. I'll try and update the file if I find any more.
+ *****NOTE*****: I fear that if he were to query for books by "J. K. Rowling", nothing will show up, since I
+ have changed the name to "J.K. Rowling". So to avoid that from happening, I am adding the booksOG.csv as the original
+ copy of the books.csv file to stay consistent with what the professor has provided us. The script has been altered to
+ reflect and account for this change, as it will now open "booksOG.csv", so keep that in mind.
 
 It is only formatted to parse through books.csv and not borrowers.csv as of 10/17.
 
