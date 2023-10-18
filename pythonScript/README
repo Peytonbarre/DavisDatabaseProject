@@ -1,0 +1,22 @@
+
+
+
+main.py simply parses through books.csv to create 3 main INSERT statement (sometimes more depending on number of
+authors).
+
+It should be known that the code does also account for duplicate author names. If an author has already been given and
+id, then author's id gets used instead of assigning them a new one.
+*****NOTE*****: I've found a few errors in the original books.csv file, the one provided is my updated one fixing some
+of these errors. The errors are inconsistent spelling of names, such as: Mclaughlin spelled as McLaughlin and
+J.K. Rowling spelled as "J. K. Rowling". Little inconsistencies like these may impact how accurate the author's ids are,
+ so keep that in mind. I'll try and update the file if I find any more.
+
+It is only formatted to parse through books.csv and not borrowers.csv as of 10/17.
+
+The python file creates a text file named "insertSTMTS" but this can be changed to your liking.
+
+Be sure that books.csv and main.py are within the same folder when running main. A project folder in PyCharm is what I
+used.
+
+This code works for me as of right now, 10/17, if you have any concerns on how to run or execute, let me know in
+discord, thank you.
