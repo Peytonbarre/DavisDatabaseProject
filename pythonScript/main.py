@@ -1,4 +1,4 @@
-f = open('books.csv', 'r', encoding="utf-8")
+f = open('booksOG.csv', 'r', encoding="utf-8")
 f2 = open('insertSTMTS.txt', 'w', encoding="utf-8")
 
 book_list = list(f)
