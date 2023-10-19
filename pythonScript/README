@@ -15,7 +15,7 @@ J.K. Rowling spelled as "J. K. Rowling". Little inconsistencies like these may i
  copy of the books.csv file to stay consistent with what the professor has provided us. The script has been altered to
  reflect and account for this change, as it will now open "booksOG.csv", so keep that in mind.
 
-It is only formatted to parse through booksOG.csv and not borrowers.csv as of 10/17.
+main.py is only formatted to parse through booksOG.csv and not borrowers.csv as of 10/17.
 
 The python file creates a text file named "insertSTMTS" but this can be changed to your liking.
 
@@ -24,3 +24,12 @@ used.
 
 This code works for me as of right now, 10/18, if you have any concerns on how to run or execute, let me know in
 discord, thank you.
+
+
+EDIT 10/19: borrowerScript.py is a little script I wrote up in class to parse through the borrowers.csv file and
+separate the lines into INSERT statements that I will incorporate in the .sql file in the sqlScript directory. As far
+as I can tell, it parsed smoothly. Any problems, let me know on discord.
+
+        - Deryck
+
+
