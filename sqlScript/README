@@ -13,12 +13,14 @@ the workshop.
 to do.
 5. Here is where I clicked File, clicked "Open SQL Script..." and then found the "create-library-database.sql" file.
 When I opened this file in the workshop, it took a second to load so if your workshop isn't responding, give it a
-minute to process your request of opening a file with 97,000 lines haha.
+minute to process your request of opening a file with 98,000 lines haha.
 6. Once everything loads, you should be able to simply click the little lightening bolt that will run every command.
 7. If there were any errors in running the script, please let me know on discord and I'll fix them asap. If there were
 no errors, then you should be able to run these few commands to make sure the script ran smoothly:
             select * from authors where authorID = 1825;
             select * from book_authors where authorID = 1825;
             select * from authors order by AuthorID DESC;
+            select * from borrower order by card_id desc;
 
     My database had AuthorIDs ranging from 1-15649, if you wanted to compare and see if it ran like mine did.
+    My database had Card_ids ranging from 1-1000, if you wanted to compare and see if it ran like mine did.
