@@ -5,7 +5,8 @@ borrower_list = list(f)
 for line in borrower_list[0:]:
     line = line.strip()
     borrowerATTR_array = line.split(',')
-    borrowerID = borrowerATTR_array[0]
+    removeID = 'ID'
+    borrowerID = borrowerATTR_array[0].replace(removeID, '')
     borrowerSSN = borrowerATTR_array[1]
     borrowerNAME = borrowerATTR_array[2] + " " + borrowerATTR_array[3]
     borrowerADDR = borrowerATTR_array[5]
