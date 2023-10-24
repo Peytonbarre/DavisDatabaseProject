@@ -1,9 +1,8 @@
 import React from "react";
+import { SearchBar } from "../components/SearchBar";
 
 export function Search() {
     return(
-        <div>
-            Search Page
-        </div>
+        <SearchBar/>
     );
 }

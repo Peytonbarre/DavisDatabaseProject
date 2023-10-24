@@ -1,9 +1,9 @@
 import React from "react";
 
-export function Checkout() {
+export function Fines() {
     return(
         <div>
-            Checkout
+            Fines
         </div>
     )
 }

@@ -10,9 +10,9 @@ export function Navbar(){
                     <img src= "../book-open.svg" alt="Book icon"></img>   Library System
                 </ReactNavBar.Brand>
                 <Nav>
-                    <Nav.Link href="/checkout">Checkout</Nav.Link>
-                    <Nav.Link href="/settings">Settings</Nav.Link>
                     <Nav.Link href="/search">Search</Nav.Link>
+                    <Nav.Link href="/fines">Fines</Nav.Link>
+                    <Nav.Link href="/Borrower">Borrower</Nav.Link>
                 </Nav>
             </Container>
         </ReactNavBar>

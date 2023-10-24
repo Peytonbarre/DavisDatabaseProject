@@ -1,9 +1,9 @@
 import React from "react";
 
-export function Settings() {
+export function Borrower() {
     return(
         <div>
-            Settings Page
+            Borrower Page
         </div>
     );
 }

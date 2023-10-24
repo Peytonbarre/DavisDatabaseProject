@@ -2,8 +2,8 @@ import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import { Home } from "./pages/Home";
-import { Checkout } from "./pages/Checkout";
-import { Settings } from "./pages/Settings";
+import { Fines } from "./pages/Fines";
+import { Borrower } from "./pages/Borrower";
 import { Search } from "./pages/Search";
 import { Landing } from "./pages/Landing";
 import { Navbar } from "./components/Navbar";
@@ -20,8 +20,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/fines" element={<Fines />} />
+          <Route path="/borrower" element={<Borrower />} />
           <Route path="/search" element={<Search />} />
         </Routes>
       </Container>
