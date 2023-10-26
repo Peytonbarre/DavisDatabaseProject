@@ -1,4 +1,4 @@
 package com.library.librarysystem2.service;
 
-public class BookServiceImp {
+public interface BorrowerService {
 }
