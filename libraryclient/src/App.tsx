@@ -7,15 +7,20 @@ import { Borrower } from "./pages/Borrower";
 import { Search } from "./pages/Search";
 import { Landing } from "./pages/Landing";
 import { Navbar } from "./components/Navbar";
+import { LandingNav } from "./components/LandingNav";
+import { Login } from "./pages/Login";
 
 function App() {
   const location = useLocation();
 
   const isLandingPage = location.pathname === "/";
+  const isLoginPage = location.pathname === "/login";
 
   return (
     <div>
-      {isLandingPage ? null : <Navbar />}
+      {isLandingPage ? <LandingNav /> : <Navbar />}
+      {/* FIX THE ROUTING SYSTEM TO SUPPORT EDGE CASE PAGES */}
+      {/* {isLoginPage ? <Login /> : <Navbar />} */}
       <Container>
         <Routes>
           <Route path="/" element={<Landing />} />

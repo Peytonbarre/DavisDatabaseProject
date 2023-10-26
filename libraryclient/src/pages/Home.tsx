@@ -1,6 +1,7 @@
 import React from 'react';
 import { SearchBar } from '../components/SearchBar';
 import { Col, Container, Row, Card, Table } from 'react-bootstrap';
+import '../assets/cardStyling.css';
 
 export function Home() {
   return (
@@ -10,7 +11,7 @@ export function Home() {
           <h3>Search for Books</h3>
         </Col>
       </Row>
-      <SearchBar/>
+      <SearchBar />
       <Card className="mt-4">
         <Card.Body>
           <Row>
@@ -18,32 +19,44 @@ export function Home() {
           </Row>
           <Row md={2} xs={1} lg={3} className="g-3">
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #1</Card.Title>
                   <Card.Subtitle>Author #1</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #2</Card.Title>
                   <Card.Subtitle>Author #2</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #3</Card.Title>
                   <Card.Subtitle>Author #3</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
@@ -57,32 +70,44 @@ export function Home() {
           </Row>
           <Row md={2} xs={1} lg={3} className="g-3">
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #1</Card.Title>
                   <Card.Subtitle>Author #1</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #2</Card.Title>
                   <Card.Subtitle>Author #2</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
             <Col>
-              <Card>
+              <Card className="hover-shadow">
+                <Card.Img
+                  variant="top"
+                  src={require('../assets/BookCover.jpg')}
+                  style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                />
                 <Card.Body>
                   <Card.Title>Book #3</Card.Title>
                   <Card.Subtitle>Author #3</Card.Subtitle>
                   <Card.Text>Other information about the book</Card.Text>
-                  <Card.Img></Card.Img>
                 </Card.Body>
               </Card>
             </Col>
@@ -147,7 +172,7 @@ export function Home() {
                       <td>Hunger Games</td>
                       <td>Suzanne Collins</td>
                       <td>2/14</td>
-                      <td className="text-danger">2/25</td>
+                      <td>2/25</td>
                       <td className="text-danger">9</td>
                     </tr>
                   </tbody>
