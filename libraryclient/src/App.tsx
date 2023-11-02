@@ -13,17 +13,17 @@ import { Login } from "./pages/Login";
 function App() {
   const location = useLocation();
 
-  const isLandingPage = location.pathname === "/";
-  const isLoginPage = location.pathname === "/login";
+  const isLandingPage = location.pathname === "/" 
+  const isLoginPage = location.pathname === "/login"
 
   return (
     <div>
-      {isLandingPage ? <LandingNav /> : <Navbar />}
-      {/* FIX THE ROUTING SYSTEM TO SUPPORT EDGE CASE PAGES */}
-      {/* {isLoginPage ? <Login /> : <Navbar />} */}
+      {/* Might need to validate this logic lol */}
+      {isLandingPage ? <LandingNav/> : isLoginPage ? <></> : <Navbar/>}
       <Container>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/fines" element={<Fines />} />
           <Route path="/borrower" element={<Borrower />} />

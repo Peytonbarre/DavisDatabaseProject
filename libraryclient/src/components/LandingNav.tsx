@@ -10,8 +10,8 @@ export function LandingNav(){
                 </ReactNavBar.Brand>
                 <Nav>
                     {/* Change this to single-page */}
-                    <Nav.Link href="/team">Our Team</Nav.Link>
-                    <Nav.Link href="/about">About</Nav.Link>
+                    <Nav.Link href="#team">Our Team</Nav.Link>
+                    <Nav.Link href="#about">About</Nav.Link>
                     <Nav.Link href="/login">Login</Nav.Link>
                 </Nav>
             </Container>
