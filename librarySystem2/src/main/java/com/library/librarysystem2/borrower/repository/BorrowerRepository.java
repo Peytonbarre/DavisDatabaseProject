@@ -1,6 +1,6 @@
-package com.library.librarysystem2.repository;
+package com.library.librarysystem2.borrower.repository;
 
-import com.library.librarysystem2.model.Borrower;
+import com.library.librarysystem2.borrower.model.Borrower;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

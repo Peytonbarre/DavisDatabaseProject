@@ -1,12 +1,7 @@
-package com.library.librarysystem2.repository;
+package com.library.librarysystem2.book.repository;
 
-import com.library.librarysystem2.model.Author;
-import com.library.librarysystem2.model.Book;
+import com.library.librarysystem2.book.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
 

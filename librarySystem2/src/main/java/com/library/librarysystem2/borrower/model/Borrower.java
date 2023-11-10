@@ -1,4 +1,4 @@
-package com.library.librarysystem2.model;
+package com.library.librarysystem2.borrower.model;
 
 
 import jakarta.persistence.Entity;
