@@ -22,9 +22,13 @@ public interface BorrowerRepository extends JpaRepository<Borrower, Integer> {
     public Borrower fetchByName(@Param("val") String name, @Param("id") int borrowerID);
     */
 
-    @Query(value="SELECT b FROM Borrower as b WHERE bname =:val")
+    @Query(value="SELECT b FROM Borrower as b WHERE b.bname =:val")
     public Borrower fetchByName(@Param("val") String name);
 
-    @Query(value="SELECT b FROM Borrower as b WHERE Card_id=:id")
+    @Query(value="SELECT b FROM Borrower as b WHERE b.Card_id=:id")
     public Borrower fetchByID(@Param("id") int borrowerID);
+
+    @Query(value="SELECT b.Card_id FROM Borrower as b WHERE b.Card_id=:id")
+    public List<Integer> fetchID(@Param("id") int borrowerID);
+
 }
