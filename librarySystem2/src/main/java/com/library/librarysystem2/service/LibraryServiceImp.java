@@ -64,6 +64,19 @@ public class LibraryServiceImp {
         }
     }
 
+    public Integer loginBorrower(int borrID, String fullName) {
+        Integer idOfBorrower = borrowerRepository.loginWithIDandNAME(borrID, fullName);
+        System.out.println("Search term - Username: " + fullName + ", Password: " + borrID);
+        System.out.println("Result of query (should be the Card_id): " + idOfBorrower);
+        if (idOfBorrower != null) {
+            System.out.println("Borrower exists and is in the database.");
+            return idOfBorrower;
+        } else {
+            System.out.println("Card_id was not found in database.");
+            return 0;
+        }
+    }
+
     public List<String> fetchWithKeyName(String auth) {
 
         List<String> authors = authorRepository.fetchAllByKeyName(auth);

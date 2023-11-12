@@ -71,6 +71,11 @@ public class LibraryController {
         return libraryServiceImp.fetchAuthorizedUser(id);
     }
 
+    @GetMapping("/borrowerLogin/{name},{id}")
+    public Integer fetchIDofBorrower( @PathVariable String name,@PathVariable int id){
+        return libraryServiceImp.loginBorrower(id, name);
+    }
+
     // still working on this for the landing page so ignore for now
     // feel free to delete if it interferes with anything
     @GetMapping("/")
