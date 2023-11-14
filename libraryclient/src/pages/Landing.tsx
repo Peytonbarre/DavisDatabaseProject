@@ -5,7 +5,7 @@ export function Landing(){
     return(
     <div className="App">
         {/* <div className="p-5 mb-4 bg-white rounded-3 shadow-sm"> */}
-        <div className="p-5 mb-4 bg-light rounded-3">
+        <div className="p-5 mb-4 bg-light rounded-3" style={{overflow: "hidden"}}>
             <div className="container-fluid py-5 d-flex align-items-center justify-content-center">
                 <Row>
                     <Col md={8}>

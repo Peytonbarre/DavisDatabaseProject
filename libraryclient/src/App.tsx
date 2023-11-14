@@ -15,7 +15,7 @@ function App() {
   const location = useLocation();
 
   const isLandingPage = location.pathname === "/" 
-  const isLoginPage = location.pathname === "/login" || "/signup"
+  const isLoginPage = location.pathname === "/login" || location.pathname === "/signup"
 
   return (
     <div>
