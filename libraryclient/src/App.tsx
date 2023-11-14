@@ -9,12 +9,13 @@ import { Landing } from "./pages/Landing";
 import { Navbar } from "./components/Navbar";
 import { LandingNav } from "./components/LandingNav";
 import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
 
 function App() {
   const location = useLocation();
 
   const isLandingPage = location.pathname === "/" 
-  const isLoginPage = location.pathname === "/login"
+  const isLoginPage = location.pathname === "/login" || "/signup"
 
   return (
     <div>
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/home" element={<Home />} />
           <Route path="/fines" element={<Fines />} />
           <Route path="/borrower" element={<Borrower />} />
