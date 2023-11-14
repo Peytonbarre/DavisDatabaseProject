@@ -16,7 +16,7 @@ public interface AuthorRepository extends JpaRepository<Authors, Integer> {
     public List<String> fetchExactMatch(@Param("val") String name);
     //Author findByName(String name);
 
-    @Query(value = " SELECT B.ISBN, B.Title, A.name FROM Authors AS A JOIN Book_Authors AS BA ON A.authorID = BA.authorID JOIN Book AS B ON BA.ISBN = B.ISBN WHERE A.name like %:val% or B.Title like %:val%")
+    @Query(value = " SELECT B.ISBN, B.Title, A.name FROM Authors AS A JOIN Book_Authors AS BA ON A.authorID = BA.authorID JOIN Book AS B ON BA.ISBN = B.ISBN WHERE A.name like %:val% or B.Title like %:val% and B.IsCheckedOut = 0")
     public List<String> searchWithKeyQuery(@Param("val") String keyW);
 
 }
