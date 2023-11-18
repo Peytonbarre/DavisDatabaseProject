@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AuthorRepository extends JpaRepository<Authors, Integer> {
 
-    @Query(value = "select a.name from Authors as a where a.name like %:val%", nativeQuery = true)
+    @Query(value = "select a.name from Authors as a where a.name like %:val%")
     public List<String> fetchAllByKeyName(@Param("val") String name);
 
     @Query(value="SELECT a.name FROM Authors as a WHERE a.name = :val", nativeQuery = true)

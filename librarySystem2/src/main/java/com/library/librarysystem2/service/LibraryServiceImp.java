@@ -28,29 +28,6 @@ public class LibraryServiceImp {
         return borrowerRepository.save(borrower);
     }
 
-    public List<Borrower> fetchAll(){
-        return borrowerRepository.fetchAllFromCustom();
-    }
-
-
-    /*
-    this only works if you POST this info as a JSON in Postman, that's what i did:
-    {
-    "ssn" : "821-32-1223",
-    "bname" : "Joe Brown",
-    "address" : "2002 duhlhjlhje dr",
-    "phone" : "(770) 777 6792"
-    }
-     */
-
-    public Borrower fetchWithName(){
-        return borrowerRepository.fetchByName("Joe Brown");
-    }
-
-    public Borrower fetchWithID(int id){
-        return borrowerRepository.fetchByID(id);
-    }
-
     public boolean fetchAuthorizedUser(int borrID) {
         List<Integer> idOfBorr = borrowerRepository.fetchID(borrID);
         System.out.println("Search term: " + borrID);

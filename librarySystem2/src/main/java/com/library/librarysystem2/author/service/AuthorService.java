@@ -21,4 +21,13 @@ public class AuthorService {
         return authors;
 
     }
+
+    public List<String> bigKeySearch(String keyWord) {
+
+        List<String> searchResults = authorRepository.searchWithKeyQuery(keyWord);
+        System.out.println("Search term: " + keyWord);
+        System.out.println("Result of query: " + searchResults);
+        return searchResults;
+
+    }
 }
