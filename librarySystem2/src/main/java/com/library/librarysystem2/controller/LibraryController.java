@@ -31,11 +31,12 @@ public class LibraryController {
         return libraryServiceImp.fetchAuthorizedUser(id);
     }
 
-    // checks if given {name}, the username, and {id}, the password, and returns the id of the borrower, only if the
-    // borrower is found in the database, of course with a matching name and id.
-    @GetMapping("/borrowerLogin/{name},{id}")
-    public Integer fetchIDofBorrower( @PathVariable String name,@PathVariable int id){
-        return libraryServiceImp.loginBorrower(id, name);
+    // checks if given {name}, the username, and {ssn}, the password, and returns the id of the borrower, only if the
+    // borrower is found in the database, of course with a matching name and ssn. the hyphens ' - ' in the ssn need to
+    // be there in order for the query to find the Card_id of the given borrower.
+    @GetMapping("/borrowerLogin/{name},{ssn}")
+    public Integer fetchIDofBorrower( @PathVariable String name,@PathVariable String ssn){
+        return libraryServiceImp.loginBorrower(ssn, name);
     }
 
     // this is a query that returns every ISBN, Book Title, and Author Name, that includes the given {keyword} which

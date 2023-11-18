@@ -31,7 +31,7 @@ public interface BorrowerRepository extends JpaRepository<Borrower, Integer> {
     @Query(value="SELECT b.Card_id FROM Borrower as b WHERE b.Card_id=:id")
     public List<Integer> fetchID(@Param("id") int borrowerID);
 
-    @Query(value="SELECT b.Card_id FROM Borrower as b WHERE b.Card_id=:id AND b.bname=:name")
-    public Integer loginWithIDandNAME(@Param("id") int borrowerID, @Param("name") String name);
+    @Query(value="SELECT b.Card_id FROM Borrower as b WHERE b.ssn=:ssn AND b.bname=:name")
+    public Integer loginWithSSNandNAME(@Param("ssn") String borrowerID, @Param("name") String name);
 
 }
