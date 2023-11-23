@@ -13,12 +13,12 @@ public class BookController {
 
     // still working on this.
     @PutMapping("/updateStatus/{ISBN}/{IsCheckedOut}")
-    public void updateBookStatus(@PathVariable Long ISBN, @PathVariable int IsCheckedOut){
+    public void updateBookStatus(@PathVariable String ISBN, @PathVariable int IsCheckedOut){
         bookServiceImp.updateBookStatus(ISBN, IsCheckedOut);
     }
     // checks if ISBN is in database, returns true if so, false if not.
     @GetMapping("/checkExists/{ISBN}")
-    public boolean checkingBook(@PathVariable Long ISBN) {
+    public boolean checkingBook(@PathVariable String ISBN) {
         return bookServiceImp.bookExists(ISBN);
     }
 

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
-    @Query(value = "select B.ISBN from Book as B where B.ISBN =:val", nativeQuery = true)
-    public String getByID(@Param("val") Long ISBN);
+    @Query(value = "select B from Book as B where B.ISBN =:val")
+    public Book getByID(@Param("val") String ISBN);
+
+    @Query(value = "select B.ISBN from Book as B where B.ISBN =:val")
+    public String getISBN(@Param("val") String ISBN);
 }

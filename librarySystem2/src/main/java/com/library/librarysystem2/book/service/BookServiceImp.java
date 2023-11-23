@@ -1,5 +1,6 @@
 package com.library.librarysystem2.book.service;
 
+import com.library.librarysystem2.book.model.Book;
 import com.library.librarysystem2.book.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,19 +15,19 @@ public class BookServiceImp {
     private BookRepository bookRepository;
 
 
-    public void updateBookStatus(Long ISBN, int IsCheckedOut) {
-        //Book book = bookRepository.getByID(ISBN);
+    public void updateBookStatus(String ISBN, int IsCheckedOut) {
+        Book book = bookRepository.getByID(ISBN);
 
         // Update the IsCheckedOut attribute
-        //book.setIsCheckedOut(IsCheckedOut);
+        book.setIsCheckedOut(IsCheckedOut);
 
         // Save the updated book
-        //bookRepository.save(book);
+        bookRepository.save(book);
     }
 
-    public boolean bookExists(Long ISBN) {
-        String isbn = bookRepository.getByID(ISBN);
+    public boolean bookExists(String ISBN) {
+        String isbn = bookRepository.getISBN(ISBN);
 
-        return Objects.equals(isbn, ISBN.toString());
+        return Objects.equals(isbn, ISBN);
     }
 }
