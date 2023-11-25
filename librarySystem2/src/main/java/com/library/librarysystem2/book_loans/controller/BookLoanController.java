@@ -1,12 +1,14 @@
 package com.library.librarysystem2.book_loans.controller;
 
 import com.library.librarysystem2.book.service.BookServiceImp;
+import com.library.librarysystem2.book_loans.model.Book_Loans;
 import com.library.librarysystem2.book_loans.service.BookLoanService;
 import com.library.librarysystem2.fines.repository.FinesRepository;
 import com.library.librarysystem2.fines.service.FinesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,4 +77,18 @@ public class BookLoanController {
         return ResponseEntity.status(500).body("An unexpected error occurred during book check-in.");
     }
 
+    @GetMapping("/isBookAvailable/{ISBN}")
+    public boolean isBookAvailable(@PathVariable String ISBN){
+        if (bookServiceImp.bookExists(ISBN)) {
+            if(!bookLoanService.isBookAvailable(ISBN)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @GetMapping("/getNumLoans/{Card_id}")
+    public int getNumLoans(@PathVariable int Card_id){
+        return bookLoanService.numBooksCheckedOut(Card_id);
+    }
 }

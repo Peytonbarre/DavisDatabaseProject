@@ -18,5 +18,4 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     public Integer getLoanID(@Param("isbn") String ISBN, @Param("card_id") int Card_id);
 
 
-
 }

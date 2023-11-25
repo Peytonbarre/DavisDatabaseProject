@@ -1,19 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
 import { Col, Container, Row, Card, Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import '../assets/cardStyling.css';
 
 export function Home() {
+  const navigate = useNavigate();
+  // const [searchTerm, setSearchTerm] = useState('');
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    if (localStorage.getItem('key') === '') {
+      navigate('/');
+    }
+
+    // const fetchData = async () => {
+    //   try{
+    //     const response = await fetch('/')
+    //   }
+    // }
+  }, []);
+
+  // const handleSearch = async () => {
+  //   try{
+  //     const response = await fetch(`/search?keyword=${searchTerm}`);
+  //     if(response.ok){
+  //       console.log("Search processed");
+  //     }else{
+  //       console.error("Search failed");
+  //     }
+  //   }catch(error){
+  //     console.error("search error: " + error);
+  //   }
+  // };
+
   return (
     <>
-        <Container className="mt-4">
+      <Container className="mt-4">
         <Row>
-          <Col sm={12}>
-            <h3>Search for Books</h3>
+          <Col sm={12} className='mt-2'>
+            <h2>Dashboard</h2>
           </Col>
         </Row>
-        <SearchBar />
-        <Card className="mt-4">
+        {/* <SearchBar onSearch={handleSearch} setSearchTerm={setSearchTerm}/> */}
+        {/* <Card className="mt-4">
           <Card.Body>
             <Row>
               <h3>Reccomended Books</h3>
@@ -63,14 +93,14 @@ export function Home() {
               </Col>
             </Row>
           </Card.Body>
-        </Card>
+        </Card> */}
         <Card className="mt-4">
           <Card.Body>
             <Row>
               <h3>Current Book Loans</h3>
             </Row>
             <Row md={2} xs={1} lg={3} className="g-3">
-              <Col>
+              {/* <Col>
                 <Card className="hover-shadow">
                   <Card.Img
                     variant="top"
@@ -83,8 +113,8 @@ export function Home() {
                     <Card.Text>Other information about the book</Card.Text>
                   </Card.Body>
                 </Card>
-              </Col>
-              <Col>
+              </Col> */}
+              {/* <Col>
                 <Card className="hover-shadow">
                   <Card.Img
                     variant="top"
@@ -97,7 +127,7 @@ export function Home() {
                     <Card.Text>Other information about the book</Card.Text>
                   </Card.Body>
                 </Card>
-              </Col>
+              </Col> */}
               <Col>
                 <Card className="hover-shadow">
                   <Card.Img

@@ -5,6 +5,8 @@ import com.library.librarysystem2.borrower.model.Borrower;
 import com.library.librarysystem2.author.repository.AuthorRepository;
 import com.library.librarysystem2.book.repository.BookRepository;
 import com.library.librarysystem2.borrower.repository.BorrowerRepository;
+import com.library.librarysystem2.exceptions.LoginFailedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +43,7 @@ public class LibraryServiceImp {
         }
     }
 
-    public Integer loginBorrower(String borrID, String fullName) {
+    public Integer loginBorrower(String borrID, String fullName){
         Integer idOfBorrower = borrowerRepository.loginWithSSNandNAME(borrID, fullName);
         System.out.println("Search term - Username: " + fullName + ", Password: " + borrID);
         System.out.println("Result of query (should be the Card_id): " + idOfBorrower);
@@ -50,7 +52,7 @@ public class LibraryServiceImp {
             return idOfBorrower;
         } else {
             System.out.println("Card_id was not found in database using given credentials.");
-            return 0;
+            throw new LoginFailedException("Login failed for username: " + fullName);
         }
     }
 

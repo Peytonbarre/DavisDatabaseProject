@@ -24,6 +24,10 @@ public class BookLoanService {
         return (bookLoanRepository.numOfLoanedBooks(Card_id)<3);
     }
 
+    public int numBooksCheckedOut(int Card_id) {
+        return bookLoanRepository.numOfLoanedBooks(Card_id);
+    }
+
     public void createBookLoan(String ISBN, int Card_id) {
 
         Book_Loans book_loans = new Book_Loans();
