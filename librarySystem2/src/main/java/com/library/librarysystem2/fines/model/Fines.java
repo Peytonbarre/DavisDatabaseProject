@@ -9,9 +9,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Fines {
+
     @Id
     private int Loan_id;
     private double Fine_amt;
-    private String Paid;
+    private int Paid;
 
 }

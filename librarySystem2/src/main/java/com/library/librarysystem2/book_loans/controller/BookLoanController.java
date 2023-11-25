@@ -2,6 +2,8 @@ package com.library.librarysystem2.book_loans.controller;
 
 import com.library.librarysystem2.book.service.BookServiceImp;
 import com.library.librarysystem2.book_loans.service.BookLoanService;
+import com.library.librarysystem2.fines.repository.FinesRepository;
+import com.library.librarysystem2.fines.service.FinesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class BookLoanController {
     private BookServiceImp bookServiceImp;
     @Autowired
     private BookLoanService bookLoanService;
+    @Autowired
+    private FinesService finesService;
 
 
     // gonna have to add another method call in the first if statement to make sure the borrower only has a max of 3
@@ -28,13 +32,20 @@ public class BookLoanController {
             if (bookLoanService.isBookAvailable(ISBN) && bookLoanService.lessThan3BooksCheckedOut(Card_id)) {
                 bookServiceImp.updateBookStatus(ISBN, 1);
                 bookLoanService.createBookLoan(ISBN, Card_id);
+                // finesService.createFine(ISBN, Card_id);      uncomment this line to test if the Fines creation works
                 if(!bookLoanService.isBookAvailable(ISBN)) {
                     String successMessage = bookLoanService.successMessage();
                     return ResponseEntity.status(200).body(successMessage);
                 }
             } else {
-                String errorMessage = "Error checking out book, please make sure that the book is not already checked out.";
-                return ResponseEntity.status(400).body(errorMessage);
+                if (!bookLoanService.lessThan3BooksCheckedOut(Card_id)) {
+                    String errorMessage = "Error checking out book, please make sure that you do not already have 3 active book loans.";
+                    return ResponseEntity.status(400).body(errorMessage);
+                }
+                if (!bookLoanService.isBookAvailable(ISBN)) {
+                    String errorMessage = "Error checking out book, please make sure that the book is not already checked out.";
+                    return ResponseEntity.status(400).body(errorMessage);
+                }
             }
         } else {
             String errorMessage = "Error checking out book, please make sure the ISBN is correct.";

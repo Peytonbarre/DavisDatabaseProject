@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class BookServiceImp {
@@ -18,10 +17,8 @@ public class BookServiceImp {
     public void updateBookStatus(String ISBN, int IsCheckedOut) {
         Book book = bookRepository.getByID(ISBN);
 
-        // Update the IsCheckedOut attribute
         book.setIsCheckedOut(IsCheckedOut);
 
-        // Save the updated book
         bookRepository.save(book);
     }
 
