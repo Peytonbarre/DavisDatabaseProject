@@ -48,4 +48,7 @@ public class LibraryController {
         return libraryServiceImp.bigKeySearch(keyword);
     }
 
+    @GetMapping("/borrowerINFO/{Card_id}")
+    public Borrower borrowerInformation(@PathVariable int Card_id) { return libraryServiceImp.borrowerINFO(Card_id); }
+
 }

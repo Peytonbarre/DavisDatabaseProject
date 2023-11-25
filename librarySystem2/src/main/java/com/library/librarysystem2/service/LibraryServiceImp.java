@@ -56,6 +56,11 @@ public class LibraryServiceImp {
         }
     }
 
+
+    public Borrower borrowerINFO(int Card_id) {
+        return borrowerRepository.fetchByID(Card_id);
+    }
+
     public List<String> fetchWithKeyName(String auth) {
 
         List<String> authors = authorRepository.fetchAllByKeyName(auth);
