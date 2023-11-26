@@ -33,8 +33,8 @@ public class BookLoanService {
         bookLoanRepository.getLoanID(ISBN, Card_id);
         book_loans.setISBN(ISBN);
         book_loans.setCard_id(Card_id);
-        book_loans.setDate_out(Date.valueOf(LocalDate.now()));
-        book_loans.setDue_date(Date.valueOf(LocalDate.now().plusDays(14)));
+        book_loans.setDate_out(Date.valueOf(LocalDate.now().minusDays(10)));
+        book_loans.setDue_date(Date.valueOf(LocalDate.now().minusDays(5)));
         book_loans.setDate_in(null);
 
         bookLoanRepository.save(book_loans);

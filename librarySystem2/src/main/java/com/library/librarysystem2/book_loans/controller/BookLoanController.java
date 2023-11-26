@@ -66,9 +66,15 @@ public class BookLoanController {
     public ResponseEntity<String> checkInBook(@PathVariable String ISBN,@PathVariable int Loan_id,@PathVariable int payment){
         if (bookServiceImp.bookExists(ISBN)) {
             if (!bookLoanService.isBookAvailable(ISBN)) {
+                finesService.updateFineForToday(Loan_id);
+                finesService.updateFineByCheckIN(Loan_id, payment);
+                if (!finesService.checkIfPaidFully(Loan_id)) {
+                    String errorMessage = "Error updating fine, please make sure you provide the full amount due, no more, no less." +
+                            " You can simply enter the amount as a whole number, ex. if your fine = $1.25, please enter '125'.";
+                    return ResponseEntity.status(400).body(errorMessage);
+                }
                 bookServiceImp.updateBookStatus(ISBN, 0);
                 bookLoanService.updateBookLoan(Loan_id);
-                finesService.updateFineByCheckIN(Loan_id, payment);
                 if (bookLoanService.isBookAvailable(ISBN)) {
                     String successMessage2 = bookLoanService.successMessage2();
                     return ResponseEntity.status(200).body(successMessage2);
