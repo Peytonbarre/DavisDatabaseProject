@@ -54,8 +54,8 @@ public class BookLoanService {
     }
 
 
-    public List<Book_Loans> activeBookLoans(int Card_id) {
-        return bookLoanRepository.activeBookLoans(Card_id);
+    public List<Book_Loans> activeBookLoans(String ISBN, int Card_id, String bname) {
+        return bookLoanRepository.activeBookLoans(ISBN, Card_id, bname);
     }
 
 

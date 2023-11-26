@@ -5,6 +5,7 @@ import com.library.librarysystem2.book_loans.model.Book_Loans;
 import com.library.librarysystem2.book_loans.service.BookLoanService;
 import com.library.librarysystem2.fines.service.FinesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +29,13 @@ public class BookLoanController {
     private FinesService finesService;
 
 
-
-    @GetMapping("/activeLoans/{Card_id}")
-    public List<Book_Loans> activeBookLoans(@PathVariable int Card_id) {
-        return bookLoanService.activeBookLoans(Card_id);
+    // made it be able to search active book loans when given isbn, card_id, or any substring of the borrower's name.
+    // only thing is, you have to pass all three variables in the path request, buuuut you can just use placeholders
+    // for the variables you don't use. ex. using 0000000000000 for ISBN, 0000 for Card_id, and abcdef for bname, and
+    // of course just replace the placeholder with the variable you want to use.
+    @GetMapping("/activeLoans/{ISBN},{Card_id},{bname}")
+    public List<Book_Loans> activeBookLoans(@PathVariable String ISBN, @PathVariable int Card_id, @PathVariable String bname) {
+        return bookLoanService.activeBookLoans(ISBN, Card_id, bname);
     }
 
     @PutMapping("/checkout/{ISBN},{Card_id}")
