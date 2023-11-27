@@ -46,4 +46,25 @@ public class FinesController {
         return finesService.displayOfActiveFinesFromCardID(Card_id);
     }
 
+    @PutMapping("/payFines/{Loan_id}, {payment}")
+    public ResponseEntity<String> payingFines(@PathVariable int Loan_id, @PathVariable int payment) {
+        if (bookLoanRepository.getBookLoanByLoanID(Loan_id) != null) {
+            finesService.updateFineForToday(Loan_id);
+            finesService.updateFineByPayment(Loan_id, payment);
+            if (!finesService.checkIfPaidFully(Loan_id)) {
+                String errorMessage = "Error updating fine, please make sure you provide the full amount due, no more, no less." +
+                        " You can simply enter the amount as a whole number, ex. if your fine = $1.25, please enter '125'.";
+                return ResponseEntity.status(400).body(errorMessage);
+            }
+            if (finesService.testUpdateFines(Loan_id) == 0) {
+                String successMessage = "Fine has been paid!";
+                return ResponseEntity.status(200).body(successMessage);
+            }
+        } else {
+            String errorMessage = "Error paying fine, please make sure the provided Loan_id is correct.";
+            return ResponseEntity.status(400).body(errorMessage);
+        }
+        return ResponseEntity.status(500).body("An unexpected error occurred during fine update.");
+    }
+
 }

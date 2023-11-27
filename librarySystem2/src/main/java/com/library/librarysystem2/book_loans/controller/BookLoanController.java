@@ -84,17 +84,11 @@ public class BookLoanController {
         return ResponseEntity.status(500).body("An unexpected error occurred during book checkout.");
     }
 
-    @PutMapping("/checkInBook/{ISBN},{Loan_id},{payment}")
-    public ResponseEntity<String> checkInBook(@PathVariable String ISBN,@PathVariable int Loan_id,@PathVariable int payment){
+    @PutMapping("/checkInBook/{ISBN},{Loan_id}")
+    public ResponseEntity<String> checkInBook(@PathVariable String ISBN,@PathVariable int Loan_id){
         if (bookServiceImp.bookExists(ISBN)) {
             if (!bookLoanService.isBookAvailable(ISBN)) {
                 finesService.updateFineForToday(Loan_id);
-                finesService.updateFineByCheckIN(Loan_id, payment);
-                if (!finesService.checkIfPaidFully(Loan_id)) {
-                    String errorMessage = "Error updating fine, please make sure you provide the full amount due, no more, no less." +
-                            " You can simply enter the amount as a whole number, ex. if your fine = $1.25, please enter '125'.";
-                    return ResponseEntity.status(400).body(errorMessage);
-                }
                 bookServiceImp.updateBookStatus(ISBN, 0);
                 bookLoanService.updateBookLoan(Loan_id);
                 if (bookLoanService.isBookAvailable(ISBN)) {

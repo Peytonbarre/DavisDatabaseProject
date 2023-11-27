@@ -38,7 +38,7 @@ public class FinesService {
     // this will return a simple message to the user stating what went wrong, you can remove the ResponseEntity
     // initialization and make the method void if you want to perform error handling before calling this method.
 
-    public void updateFineByCheckIN(int Loan_id, int payment) {
+    public void updateFineByPayment(int Loan_id, int payment) {
         Fines fines = finesRepository.getFinesByLoanID(Loan_id);
 
         if (fines.getFine_amt() != 0) {
@@ -48,6 +48,7 @@ public class FinesService {
             } else {
                 double fineAMT = fines.getFine_amt() - paymentD;
                 fines.setFine_amt(fineAMT);
+                fines.setPaid(1);
                 finesRepository.save(fines);
             }
         } else {                // Fine_amt must be zero so when user checks in book and fine amount is zero, then simply
