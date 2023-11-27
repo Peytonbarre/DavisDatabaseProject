@@ -1,19 +1,49 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
+interface Borrower {
+  name: string;
+  ssn: string;
+  address: string;
+  phone: string;
+}
+
 export function Borrower() {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState<Borrower>();
 
   useEffect(() => {
     if (localStorage.getItem('key') === '') {
       navigate('/');
     }
+
+    getUserData();
   }, []);
 
   const buttonHandler = () => {
     localStorage.setItem('key', '');
     navigate('/');
+  };
+
+  const getUserData = async () => {
+    try {
+      const response = await fetch(`/borrowerINFO/${localStorage.getItem('key')}`);
+      if (response.ok) {
+        const data = await response.json();
+        const mappedData: Borrower = {
+          name: data.bname,
+          ssn: data.ssn,
+          address: data.address,
+          phone: data.phone,
+        };
+        setUserData(mappedData);
+      } else {
+        console.log('Error getting user data response');
+      }
+    } catch (error) {
+      console.error('Error getting user data: ' + error);
+    }
   };
 
   return (
@@ -31,19 +61,16 @@ export function Borrower() {
           className="mt-5 mb-4"
         />
         <h2 className="mb-4 text-left" style={{ fontWeight: '700' }}>
-          Example Name
+          {userData?.name}
         </h2>
         <h4 className="text-left" style={{ fontWeight: '400' }}>
-          Card ID: 100923
-        </h4>
-        <h4 className="text-left" style={{ fontWeight: '400' }}>
-          Ssn: 104-213-1452
+          Card-Id: {localStorage.getItem('key')}
         </h4>
         <h5 className="text-left" style={{ fontWeight: '400' }}>
-          Address: 28123 Birdview Lane
+          Address: {userData?.address}
         </h5>
         <h5 className="mb-4 text-left" style={{ fontWeight: '400' }}>
-          Phone: 104-213-1452
+          Phone: {userData?.phone}
         </h5>
         <Button variant="danger" className="mb-5" onClick={buttonHandler}>
           Sign Out

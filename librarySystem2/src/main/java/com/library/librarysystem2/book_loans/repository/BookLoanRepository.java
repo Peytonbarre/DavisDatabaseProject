@@ -24,8 +24,8 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     @Query(value = "select b from Book_Loans as b where b.Card_id =:card_id and b.Date_in = null")
     public List<Book_Loans> activeBookLoans(@Param("card_id") int Card_id);
 
-/*    @Query(value = "SELECT b.ISBN, b.Title, a.name, bl.Date_out, bl.Due_date FROM Book_Loans bl INNER JOIN Book_Authors ba ON bl.ISBN = ba.ISBN INNER JOIN Authors a ON ba.AuthorID = a.AuthorID JOIN Book AS B ON BA.ISBN = B.ISBN  WHERE bl.Card_id = :card_id AND bl.Date_in IS NULL", nativeQuery = true)
-    public List<Object[]> activeBookLoans(@Param("card_id") int Card_id);*/
+    @Query(value = "SELECT b.ISBN, b.Title, a.name, bl.Date_out, bl.Due_date FROM Book_Loans bl INNER JOIN Book_Authors ba ON bl.ISBN = ba.ISBN INNER JOIN Authors a ON ba.AuthorID = a.AuthorID JOIN Book AS B ON BA.ISBN = B.ISBN  WHERE bl.Card_id = :card_id AND bl.Date_in IS NULL", nativeQuery = true)
+    public List<Object[]> currentBookLoans(@Param("card_id") int Card_id);
 
 
 }

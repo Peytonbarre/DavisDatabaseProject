@@ -58,7 +58,9 @@ public class BookLoanService {
         return bookLoanRepository.activeBookLoans(Card_id);
     }
 
-
+    public List<Object[]> currentBookLoans(int Card_id) {
+        return bookLoanRepository.currentBookLoans(Card_id);
+    }
 
     public String successMessage() {
         return ("Book has been checked out! Take a look at our other selections if you want to " +

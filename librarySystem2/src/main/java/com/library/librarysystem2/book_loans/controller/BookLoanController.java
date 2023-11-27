@@ -27,11 +27,19 @@ public class BookLoanController {
     @Autowired
     private FinesService finesService;
 
-
-
     @GetMapping("/activeLoans/{Card_id}")
     public List<Book_Loans> activeBookLoans(@PathVariable int Card_id) {
         return bookLoanService.activeBookLoans(Card_id);
+    }
+
+    @GetMapping("/getLoanId/{ISBN},{Card_id}")
+    public Integer getLoanId(@PathVariable String ISBN, @PathVariable int Card_id) {
+        return bookLoanService.loanIDofBL(ISBN, Card_id);
+    }
+
+    @GetMapping("/currentLoans/{Card_id}")
+    public List<Object[]> currentBookLoans(@PathVariable int Card_id){
+        return bookLoanService.currentBookLoans(Card_id);
     }
 
     @PutMapping("/checkout/{ISBN},{Card_id}")
