@@ -61,8 +61,8 @@ public class FinesService {
         Book_Loans book_loans = bookLoanRepository.getBookLoanByLoanID(Loan_id);
 
         // converting java.sql.Date to java.time.LocalDate
-        Instant instant = Instant.ofEpochMilli(book_loans.getDue_date().getTime());
-        LocalDate dueDate = LocalDate.ofInstant(instant, ZoneId.systemDefault());
+        // Instant instant = Instant.ofEpochMilli(book_loans.getDue_date().getTime());
+        LocalDate dueDate = book_loans.getDue_date().toLocalDate();
 
         // still working on this - Deryck
 

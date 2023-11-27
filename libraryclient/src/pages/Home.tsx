@@ -238,7 +238,7 @@ export function Home() {
             </Row>
           </Card.Body>
         </Card>
-        <Row md={1} x={1} lg={2} className="g-3">
+        <Row md={1} x={1} lg={2} className="g-3 mb-5">
           <Col>
             <Card className="mt-4 px-3">
               <Card.Body>
@@ -292,7 +292,7 @@ export function Home() {
                           <td>{result.author}</td>
                           <td>{result.date_in}</td>
                           <td>{result.date_out}</td>
-                          <td className="text-danger">9</td>
+                          <td className="text-danger">0</td>
                         </tr>
                       ))}
                     </tbody>

@@ -11,13 +11,26 @@ interface CurrentFines {
 export function Fines() {
   const navigate = useNavigate();
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     if (localStorage.getItem('key') === '') {
       navigate('/');
     }
     displayFines();
-  }, []);
+  }, [currentDate]);
+
+  const increaseDate = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
+
+  const decreaseDate = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
 
   const displayFines = async () => {
     try {
@@ -32,14 +45,17 @@ export function Fines() {
               const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
               const loanData: string[][] = await loanResponse.json();
               if (loanResponse.ok) {
-                const date = new Date(loanData[0][1]);
-                const currentDate = new Date();
-                const timeDifference = new Date(Math.abs(date.getTime() - currentDate.getTime()));
-                const timeDifference2 = timeDifference.getDate() - 1;
+                const dueDate = new Date(loanData[0][1]);
+                const currentDateClone = new Date(currentDate);
+                const isOverdue = currentDateClone > dueDate;
+                const timeDifference = isOverdue
+                  ? getDaysDifference(dueDate, currentDateClone)
+                  : 0;
                 return {
                   title: loanData[0][0],
-                  days_late: String(timeDifference2),
-                  fineAmt: loanData[0][2],
+                  days_late: String(timeDifference-1),
+                  fineAmt: String(0.25*(timeDifference-1)),
+                  // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
                 };
               }
               return null;
@@ -52,6 +68,16 @@ export function Fines() {
       console.error('Error displaying fines: ' + error);
     }
   };
+
+  function getDaysDifference(date1: Date, date2: Date) {
+    const oneDay = 24 * 60 * 60 * 1000; 
+    const utcDate1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const utcDate2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    const timeDifference = utcDate2 - utcDate1;
+    const daysDifference = Math.floor(timeDifference / oneDay);
+  
+    return daysDifference;
+  }
 
   return (
     <div>
@@ -82,9 +108,15 @@ export function Fines() {
           </Row>
         </Card.Body>
       </Card>
-      <Button variant="primary" size="sm" className="mt-3">
-        Update
-      </Button>
+      <div className="d-flex align-items-center justify-content-center mt-2">
+        <Button variant="primary" size="sm" className="mt-3 me-3" onClick={decreaseDate}>
+          Prev Day
+        </Button>
+        <h5 className="mt-3 me-3 mb-0">{currentDate.toDateString()}</h5>
+        <Button variant="primary" size="sm" className="mt-3" onClick={increaseDate}>
+          Next Day
+        </Button>
+      </div>
     </div>
   );
 }
