@@ -3,6 +3,10 @@ package com.library.librarysystem2.book_loans.service;
 import com.library.librarysystem2.book.model.Book;
 import com.library.librarysystem2.book_loans.model.Book_Loans;
 import com.library.librarysystem2.book_loans.repository.BookLoanRepository;
+
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -53,7 +57,11 @@ public class BookLoanService {
         return bookLoanRepository.getLoanID(ISBN, Card_id);
     }
 
+    // public Integer loanIDofBLUnique(String ISBN, int Card_id, String author) {
+    //     return bookLoanRepository.getLoanIDUnique(ISBN, Card_id, author);
+    // }
 
+        
     public List<Book_Loans> activeBookLoans(String ISBN, int Card_id, String bname) {
         return bookLoanRepository.activeBookLoans(ISBN, Card_id, bname);
     }
@@ -73,4 +81,9 @@ public class BookLoanService {
                 "borrower another. Please be aware we only allow 3 books to be checked out at a time per " +
                 "customer, thank you for understanding.");
     }
+
+    public List<Object[]> getBookData(int loan_id) {
+        return bookLoanRepository.getBookData(loan_id);
+    }
+
 }

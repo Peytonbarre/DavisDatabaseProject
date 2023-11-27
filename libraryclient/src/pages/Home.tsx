@@ -12,9 +12,16 @@ interface CurrentLoans {
   date_in: string;
 }
 
+interface CurrentFines {
+  title: string;
+  days_late: string;
+  fineAmt: string;
+}
+
 export function Home() {
   const navigate = useNavigate();
   const [currentLoans, setCurrentLoans] = useState<CurrentLoans[]>([]);
+  const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
 
   useEffect(() => {
     if (localStorage.getItem('key') === '') {
@@ -22,6 +29,7 @@ export function Home() {
     }
 
     fetchData();
+    displayFines();
   }, []);
 
   const fetchData = async () => {
@@ -33,6 +41,7 @@ export function Home() {
 
         const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
         setCurrentLoans(uniqueLoanList);
+        updateFines(uniqueLoanList);
       } else {
         console.error('Error getting current loans response');
       }
@@ -74,6 +83,68 @@ export function Home() {
       }
     } catch (error) {
       console.error('Error getting loanID: ' + error);
+    }
+  };
+
+  const displayFines = async () => {
+    try {
+      const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
+      if (response.ok) {
+        const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
+          await response.json();
+        const finesArray: CurrentFines[] = (
+          await Promise.all(
+            finedata.map(async (fine) => {
+              console.log(fine);
+              const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+              const loanData: string[][] = await loanResponse.json();
+              if (loanResponse.ok) {
+                const date = new Date(loanData[0][1]);
+                const currentDate = new Date();
+                const timeDifference = new Date(Math.abs(date.getTime() - currentDate.getTime()));
+                const timeDifference2 = timeDifference.getDate() - 1;
+                return {
+                  title: loanData[0][0],
+                  days_late: String(timeDifference2),
+                  fineAmt: loanData[0][2],
+                };
+              }
+              return null;
+            }),
+          )
+        ).filter((fine): fine is CurrentFines => fine !== null);
+        setCurrentFines(finesArray);
+      }
+    } catch (error) {
+      console.error('Error displaying fines: ' + error);
+    }
+  };
+
+  const updateFines = async (data: CurrentLoans[]) => {
+    try {
+      const reponse = data.map(async (loan) => {
+        const loanID = await getLoanID(loan.isbn);
+        console.log(loanID);
+        const singleResponse = await fetch(`/fines/updateFines/${loanID}`, { method: 'PUT' });
+      });
+    } catch (error) {
+      console.error('error updating fines: ' + error);
+    }
+  };
+
+  const getLoanID = async (isbn: string) => {
+    try {
+      const response = await fetch(`/book-loans/getLoanId/${isbn},${localStorage.getItem('key')}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else {
+        console.error('Error getting loanID response');
+        return '';
+      }
+    } catch (error) {
+      console.error('error updating fines: ' + error);
+      return '';
     }
   };
 
@@ -146,8 +217,8 @@ export function Home() {
             </Row>
             <Row md={2} xs={1} lg={3} className="g-3">
               {currentLoans.map((result, index) => (
-                <Col>
-                  <Card className="hover-shadow" key={index}>
+                <Col key={index}>
+                  <Card className="hover-shadow">
                     <Card.Img
                       variant="top"
                       src={`https://pictures.abebooks.com/isbn/${result.isbn}.jpg`}
@@ -179,24 +250,18 @@ export function Home() {
                     <thead>
                       <tr>
                         <th>Title</th>
-                        <th>Author</th>
                         <th>Days Late</th>
                         <th>Total Fine</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Harry Potter</td>
-                        <td>Jk rowling</td>
-                        <td>8</td>
-                        <td className="text-danger">$65.34</td>
-                      </tr>
-                      <tr>
-                        <td>Book Title 2</td>
-                        <td>Book Author 2</td>
-                        <td>2</td>
-                        <td className="text-danger">$25.33</td>
-                      </tr>
+                      {currentFines.map((fine, index) => (
+                        <tr key={index}>
+                          <td>{fine.title}</td>
+                          <td>{fine.days_late}</td>
+                          <td className="text-danger">${fine.fineAmt}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </Table>
                 </Row>

@@ -41,6 +41,16 @@ public class BookLoanController {
         return bookLoanService.loanIDofBL(ISBN, Card_id);
     }
 
+    // @GetMapping("/getLoanIdUnique/{ISBN},{Card_id},{author}")
+    // public Integer getLoanIdUnique(@PathVariable String ISBN, @PathVariable int Card_id, @PathVariable String author) {
+    //     return bookLoanService.loanIDofBLUnique(ISBN, Card_id, author);
+    // }
+
+    @GetMapping("/getBookData/{Loan_id}")
+    public List<Object[]> getBookData(@PathVariable int Loan_id){
+        return bookLoanService.getBookData(Loan_id);
+    }
+
     @GetMapping("/currentLoans/{Card_id}")
     public List<Object[]> currentBookLoans(@PathVariable int Card_id){
         return bookLoanService.currentBookLoans(Card_id);
