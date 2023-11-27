@@ -5,6 +5,7 @@ import com.library.librarysystem2.book_loans.model.Book_Loans;
 import com.library.librarysystem2.book_loans.service.BookLoanService;
 import com.library.librarysystem2.fines.service.FinesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +27,13 @@ public class BookLoanController {
     private BookLoanService bookLoanService;
     @Autowired
     private FinesService finesService;
-
-    @GetMapping("/activeLoans/{Card_id}")
-    public List<Book_Loans> activeBookLoans(@PathVariable int Card_id) {
-        return bookLoanService.activeBookLoans(Card_id);
+    // made it be able to search active book loans when given isbn, card_id, or any substring of the borrower's name.
+    // only thing is, you have to pass all three variables in the path request, buuuut you can just use placeholders
+    // for the variables you don't use. ex. using 0000000000000 for ISBN, 0000 for Card_id, and abcdef for bname, and
+    // of course just replace the placeholder with the variable you want to use.
+    @GetMapping("/activeLoans/{ISBN},{Card_id},{bname}")
+    public List<Book_Loans> activeBookLoans(@PathVariable String ISBN, @PathVariable int Card_id, @PathVariable String bname) {
+        return bookLoanService.activeBookLoans(ISBN, Card_id, bname);
     }
 
     @GetMapping("/getLoanId/{ISBN},{Card_id}")
@@ -74,9 +78,15 @@ public class BookLoanController {
     public ResponseEntity<String> checkInBook(@PathVariable String ISBN,@PathVariable int Loan_id,@PathVariable int payment){
         if (bookServiceImp.bookExists(ISBN)) {
             if (!bookLoanService.isBookAvailable(ISBN)) {
+                finesService.updateFineForToday(Loan_id);
+                finesService.updateFineByCheckIN(Loan_id, payment);
+                if (!finesService.checkIfPaidFully(Loan_id)) {
+                    String errorMessage = "Error updating fine, please make sure you provide the full amount due, no more, no less." +
+                            " You can simply enter the amount as a whole number, ex. if your fine = $1.25, please enter '125'.";
+                    return ResponseEntity.status(400).body(errorMessage);
+                }
                 bookServiceImp.updateBookStatus(ISBN, 0);
                 bookLoanService.updateBookLoan(Loan_id);
-                finesService.updateFineByCheckIN(Loan_id, payment);
                 if (bookLoanService.isBookAvailable(ISBN)) {
                     String successMessage2 = bookLoanService.successMessage2();
                     return ResponseEntity.status(200).body(successMessage2);
