@@ -65,9 +65,8 @@ public class FinesService {
         // Instant instant = Instant.ofEpochMilli(book_loans.getDue_date().getTime());
         LocalDate dueDate = book_loans.getDue_date().toLocalDate();
 
-        // still working on this - Deryck
 
-        if (fines.getPaid() == 0) {
+        if (fines.getPaid() == 0 && book_loans.getDate_in() == null) {
             // if book is overdue
             if (book_loans.getDue_date() != null && Date.valueOf(LocalDate.now()).compareTo(book_loans.getDue_date()) > 0 ) {
                 long daysOverdue = LocalDate.now().toEpochDay() - dueDate.toEpochDay();
@@ -83,7 +82,6 @@ public class FinesService {
                     System.out.println("New fine amount: " + updatedFineAmt);
                     fines.setFine_amt(updatedFineAmt);
                 }
-
             }
         }
         finesRepository.save(fines);
