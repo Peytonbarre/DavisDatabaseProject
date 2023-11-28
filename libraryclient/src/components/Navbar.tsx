@@ -6,7 +6,7 @@ export function Navbar(){
         // TODO Change styling
         <ReactNavBar className = "bg-white shadow-sm mb-3">
             <Container>
-                <ReactNavBar.Brand href="/home">
+                <ReactNavBar.Brand href="/">
                     <img src= "../book-open.svg" alt="Book icon"></img>   Library System
                 </ReactNavBar.Brand>
                 <Nav>

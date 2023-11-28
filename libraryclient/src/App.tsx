@@ -14,7 +14,7 @@ import { Signup } from "./pages/Signup";
 function App() {
   const location = useLocation();
 
-  const isLandingPage = location.pathname === "/" 
+  const isLandingPage = location.pathname === "/landing" 
   const isLoginPage = location.pathname === "/login" || location.pathname === "/signup"
 
   return (
@@ -23,10 +23,7 @@ function App() {
       {isLandingPage ? <LandingNav/> : isLoginPage ? <></> : <Navbar/>}
       <Container>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/fines" element={<Fines />} />
           <Route path="/borrower" element={<Borrower />} />
           <Route path="/search" element={<Search />} />
