@@ -3,6 +3,7 @@ import { SearchBar } from '../components/SearchBar';
 import { Card, Container, Spinner, Button, ToggleButton, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
+import { CardIDPrompt } from '../components/CardIDPrompt';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface SearchResult {
@@ -27,17 +28,23 @@ export function Search() {
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isbnSearch, setIsbnSearch] = useState('');
+  const [cardIDPopup, setCardIDPopup] = useState(false);
+  const [triggerIDToast, setTriggerIDToast] = useState(false);
   const itemsPerPage = 5;
-
-  useEffect(() => {
-    if (localStorage.getItem('key') === '') {
-      navigate('/');
-    }
-  }, [navigate]);
 
   useEffect(() => {
     handleSearch();
   }, [searchTerm]);
+
+  useEffect(() => {
+    if(triggerIDToast){
+    }
+    setTriggerIDToast(false);
+  }, [triggerIDToast]);
+
+  const triggerToast = () => {
+    toast.success("Book loan created");
+  }
 
   const handleSearch = async () => {
     try {
@@ -138,6 +145,7 @@ export function Search() {
 
   const handleCheckout = async () => {
     try {
+      setCardIDPopup(true);
       const checkedOutBooks = Object.keys(checkedOut).filter((isbn) => checkedOut[isbn]);
       if (checkedOutBooks.length === 0) {
         toast.warning('No books selected');
@@ -175,6 +183,49 @@ export function Search() {
     }
   };
 
+  const handleIDPopup = async () => {
+    setCardIDPopup(false);
+  };
+
+  // const handleCheckout = async () => {
+  //   try {
+  //     const checkedOutBooks = Object.keys(checkedOut).filter((isbn) => checkedOut[isbn]);
+  //     if (checkedOutBooks.length === 0) {
+  //       toast.warning('No books selected');
+  //       return;
+  //     } else if ((await getNumCheckedOut()) + checkedOutBooks.length > 3) {
+  //       toast.error('Too many books checked out');
+  //       return;
+  //     } else {
+  //       await Promise.all(
+  //         checkedOutBooks.map(async (isbn) => {
+  //           const response = await fetch(
+  //             `/book-loans/checkout/${isbn},${localStorage.getItem('key')}`,
+  //             {
+  //               method: 'PUT',
+  //             },
+  //           );
+
+  //           if (response.ok) {
+  //             console.log('Book checked out');
+  //             setCheckedOut((prev) => ({ ...prev, [isbn]: false }));
+  //           } else {
+  //             console.error('Error checking out book');
+  //           }
+  //         }),
+  //       );
+  //       await handleSearch();
+  //       await new Promise((resolve) => {
+  //         toast.success('Books have been checked out', {
+  //           onClose: resolve,
+  //         });
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking out: ' + error);
+  //   }
+  // };
+
   const getNumCheckedOut = async () => {
     try {
       const response = await fetch(`/book-loans/getNumLoans/${localStorage.getItem('key')}`);
@@ -203,7 +254,7 @@ export function Search() {
           {
             method: 'PUT',
             headers: {
-              'Content-Type': 'application/json', 
+              'Content-Type': 'application/json',
             },
           },
         );
@@ -221,36 +272,42 @@ export function Search() {
     }
   };
 
-  const handleQuickCheckout = async (isbn: string) => {
-    try{
-      if(await getNumCheckedOut() > 2){
-        toast.error("Too many books checked out")
-      }else{
-        const response = await fetch(
-          `/book-loans/checkout/${isbn},${localStorage.getItem('key')}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json', 
-            },
-          },
-        );
-        if(response.ok){
-          console.log('Book checked out');
-          setCheckedOut((prev) => ({ ...prev, [isbn]: false }));
-        }else{
-          toast.error('Book already checked out / not found');
-        }
-        await handleSearch();
-        await new Promise((resolve) => {
-          toast.success('Book has been checked out', {
-            onClose: resolve,
-          });
-        });
-      }
-    }catch{
+  // const handleQuickCheckout = async (isbn: string) => {
+  //   try{
+  //     if(await getNumCheckedOut() > 2){
+  //       toast.error("Too many books checked out")
+  //     }else{
+  //       const response = await fetch(
+  //         `/book-loans/checkout/${isbn},${localStorage.getItem('key')}`,
+  //         {
+  //           method: 'PUT',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //         },
+  //       );
+  //       if(response.ok){
+  //         console.log('Book checked out');
+  //         setCheckedOut((prev) => ({ ...prev, [isbn]: false }));
+  //       }else{
+  //         toast.error('Book already checked out / not found');
+  //       }
+  //       await handleSearch();
+  //       await new Promise((resolve) => {
+  //         toast.success('Book has been checked out', {
+  //           onClose: resolve,
+  //         });
+  //       });
+  //     }
+  //   }catch{
 
-    };
+  //   };
+  // };
+
+  const checkoutErrors = async (isbn: string) => {};
+
+  const handleQuickCheckout = async () => {
+    setCardIDPopup(true);
   };
 
   const indexOfLastItem = pageNumber * itemsPerPage;
@@ -260,6 +317,7 @@ export function Search() {
   return (
     <>
       <ToastContainer />
+      {cardIDPopup && <CardIDPrompt onClickFunction={handleIDPopup} triggerToast={triggerToast}/>}
       <SearchBar
         onSearch={handleSearch}
         setSearchTerm={setSearchTermWithEffect}
@@ -312,7 +370,9 @@ export function Search() {
                 </Card.Text>
                 {!result.available ? (
                   <>
-                    <Button className="me-2" onClick={() => handleQuickCheckout(result.isbn)}>Quick Checkout</Button>
+                    <Button className="me-2" onClick={() => handleQuickCheckout()}>
+                      Quick Checkout
+                    </Button>
                     <ToggleButton
                       id={`toggle-check-${result.isbn}`}
                       type="checkbox"
@@ -354,7 +414,11 @@ export function Search() {
                 value={isbnSearch}
                 onChange={(e) => setIsbnSearch(e.target.value)}
               />
-              <Button className="mx-3 mt-2 mb-4" onClick={handleCheckoutbyISBN} variant="success">
+              <Button
+                className="mx-3 mt-2 mb-4 rounded-pill"
+                onClick={handleCheckoutbyISBN}
+                variant="success"
+              >
                 Checkout By ISBN
               </Button>
             </Form>
