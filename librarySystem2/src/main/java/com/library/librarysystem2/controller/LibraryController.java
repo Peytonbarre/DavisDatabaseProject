@@ -51,4 +51,7 @@ public class LibraryController {
     @GetMapping("/borrowerINFO/{Card_id}")
     public Borrower borrowerInformation(@PathVariable int Card_id) { return libraryServiceImp.borrowerINFO(Card_id); }
 
+    @GetMapping("/checkSSN/{SSN}")
+    public boolean checkIfSSNExists(@PathVariable String SSN) { return libraryServiceImp.ssnIsInDB(SSN); }
+
 }

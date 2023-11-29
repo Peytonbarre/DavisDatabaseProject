@@ -120,4 +120,7 @@ public class BookLoanController {
     public int getNumLoans(@PathVariable int Card_id){
         return bookLoanService.numBooksCheckedOut(Card_id);
     }
+
+    @GetMapping("/allActiveBookLoans")
+    public List<Book_Loans> allActiveBookLoans() { return bookLoanService.everyActiveBookLoan(); }
 }

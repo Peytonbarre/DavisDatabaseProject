@@ -67,4 +67,9 @@ public class FinesController {
         return ResponseEntity.status(500).body("An unexpected error occurred during fine update.");
     }
 
+    @GetMapping("/activeFines")
+    public List<Fines> allActiveFines() {
+        return finesService.displayAllActiveFines();
+    }
+
 }

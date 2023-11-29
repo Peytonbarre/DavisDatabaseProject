@@ -24,4 +24,7 @@ public interface FinesRepository extends JpaRepository<Fines, Integer> {
 
     @Query(value = "select f from Fines as f inner join Book_Loans as bl on bl.Loan_id = f.Loan_id where bl.Card_id =:card_id and f.Paid = 0")
     public List<Fines> displayOfActiveFinesFromCard_id(@Param("card_id") int Card_id);
+
+    @Query(value = "select f from Fines as f where f.Paid = 0")
+    public List<Fines> allActiveFines();
 }

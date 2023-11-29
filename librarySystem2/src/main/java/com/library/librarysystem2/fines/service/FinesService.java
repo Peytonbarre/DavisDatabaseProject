@@ -106,5 +106,8 @@ public class FinesService {
         return finesRepository.displayOfActiveFinesFromCard_id(Card_id);
     }
 
+    public List<Fines> displayAllActiveFines() {
+        return finesRepository.allActiveFines();
+    }
 
 }
