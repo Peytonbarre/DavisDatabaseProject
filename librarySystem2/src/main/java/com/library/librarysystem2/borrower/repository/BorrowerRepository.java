@@ -34,4 +34,7 @@ public interface BorrowerRepository extends JpaRepository<Borrower, Integer> {
     @Query(value="SELECT b.Card_id FROM Borrower as b WHERE b.ssn=:ssn AND b.bname=:name")
     public Integer loginWithSSNandNAME(@Param("ssn") String borrowerID, @Param("name") String name);
 
+    @Query(value = "SELECT b.ssn FROM Borrower AS b WHERE b.ssn=:ssn")
+    public String ssnInDB(@Param("ssn") String SSN);
+
 }

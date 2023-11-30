@@ -36,5 +36,8 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     // @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Card_id=:card_id group by b.isbn")
     // public Integer getLoanIDException(@Param("isbn") String ISBN, @Param("card_id") int Card_id);
 
+    @Query(value = "select b from Book_Loans as b where b.Date_in = null")
+    public List<Book_Loans> allActiveBookLoans();
+
 
 }
