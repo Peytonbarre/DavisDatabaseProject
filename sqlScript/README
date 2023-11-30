@@ -1,20 +1,35 @@
+GETTING PROJECT SET UP
 
+1. Clone project on your local machine
+2. If you do not have MyOracle download it
+3. After you download it and set it up, create a password (will be needed to access the DB)
+4. To setup the DB with all the tables required, open the folder named "sqlScript", then open the "create-library-database" file where you will find multiple scripts
+5. load up your SQL command line, which should have downloaded after downloading MySQL
+6. Put in your password
+7. type "source [path of the "create-library-database" file] and press Enter
+
+BOOTING UP THE FRONTEND AND BACKEND
+
+1. If using VS code, open the libraryclient folder in a seperate window and librarySystem2 folder in a different window
+2. in the libraryclient folder, open up the terminal and type "npm run" to boot up the client side on your machine
+3. In the librarysystem2 folder, go to the src folder then the main folder. in the main folder you will find the "LibrarySystem2Application.java" file. with the VScode debuger, run the program.(click on the button with the play icon to the top right of the window)
 
 This is simply an SQL text file. I tried to use the "Run SQL Script..." option in MySQL workbench, but it was
 unsuccessful. Instead, I opened the file using the "Open SQL Script..." option. To do this:
-1. Here is where I clicked File, clicked "Open SQL Script..." and then found the "create-library-database.sql" file.
-When I opened this file in the workshop, it took a second to load so if your workshop isn't responding, give it a
-minute to process your request of opening a file with 98,000 lines haha.
-2. Once everything loads, you should be able to simply click the little lightening bolt that will run every command.
-3. If there were no errors creating the database, you should see it in the list of schemas. If not, click the little
-refresh button on the Navigator window. If it still doesn't show up, try seeing what error it gave you at the bottom of
-the workshop.
-4. If there were any errors in running the script, please let me know on discord and I'll fix them asap. If there were
-no errors, then you should be able to run these few commands to make sure the script ran smoothly:
-            select * from authors where authorID = 1825;
-            select * from book_authors where authorID = 1825;
-            select * from authors order by AuthorID DESC;
-            select * from borrower order by card_id desc;
 
-    My database had AuthorIDs ranging from 1-15649, if you wanted to compare and see if it ran like mine did.
-    My database had Card_ids ranging from 1-1000, if you wanted to compare and see if it ran like mine did.
+1.  Here is where I clicked File, clicked "Open SQL Script..." and then found the "create-library-database.sql" file.
+    When I opened this file in the workshop, it took a second to load so if your workshop isn't responding, give it a
+    minute to process your request of opening a file with 98,000 lines haha.
+2.  Once everything loads, you should be able to simply click the little lightening bolt that will run every command.
+3.  If there were no errors creating the database, you should see it in the list of schemas. If not, click the little
+    refresh button on the Navigator window. If it still doesn't show up, try seeing what error it gave you at the bottom of
+    the workshop.
+4.  If there were any errors in running the script, please let me know on discord and I'll fix them asap. If there were
+    no errors, then you should be able to run these few commands to make sure the script ran smoothly:
+    select _ from authors where authorID = 1825;
+    select _ from book_authors where authorID = 1825;
+    select _ from authors order by AuthorID DESC;
+    select _ from borrower order by card_id desc;
+
+        My database had AuthorIDs ranging from 1-15649, if you wanted to compare and see if it ran like mine did.
+        My database had Card_ids ranging from 1-1000, if you wanted to compare and see if it ran like mine did.
