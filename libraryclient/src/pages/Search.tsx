@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
-import { Card, Container, Spinner, Button, ToggleButton, Form } from 'react-bootstrap';
+import { Card, Container, Spinner, Button, ToggleButton, Form, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { CardIDPrompt } from '../components/CardIDPrompt';
@@ -30,6 +30,9 @@ export function Search() {
   const [isbnSearch, setIsbnSearch] = useState('');
   const [cardIDPopup, setCardIDPopup] = useState(false);
   const [triggerIDToast, setTriggerIDToast] = useState(false);
+  const [checkoutOption, setCheckoutOption] = useState('');
+  const [validCardID, setValidCardID] = useState('');
+  const [quickChecoutISBN, setQuickCheckoutISBN] = useState('');
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -37,14 +40,14 @@ export function Search() {
   }, [searchTerm]);
 
   useEffect(() => {
-    if(triggerIDToast){
+    if (triggerIDToast) {
     }
     setTriggerIDToast(false);
   }, [triggerIDToast]);
 
   const triggerToast = () => {
-    toast.success("Book loan created");
-  }
+    // toast.success('Book loan created');
+  };
 
   const handleSearch = async () => {
     try {
@@ -144,47 +147,81 @@ export function Search() {
   };
 
   const handleCheckout = async () => {
-    try {
-      setCardIDPopup(true);
-      const checkedOutBooks = Object.keys(checkedOut).filter((isbn) => checkedOut[isbn]);
-      if (checkedOutBooks.length === 0) {
-        toast.warning('No books selected');
-        return;
-      } else if ((await getNumCheckedOut()) + checkedOutBooks.length > 3) {
-        toast.error('Too many books checked out');
-        return;
-      } else {
-        await Promise.all(
-          checkedOutBooks.map(async (isbn) => {
-            const response = await fetch(
-              `/book-loans/checkout/${isbn},${localStorage.getItem('key')}`,
-              {
-                method: 'PUT',
-              },
-            );
-
-            if (response.ok) {
-              console.log('Book checked out');
-              setCheckedOut((prev) => ({ ...prev, [isbn]: false }));
-            } else {
-              console.error('Error checking out book');
-            }
-          }),
-        );
-        await handleSearch();
-        await new Promise((resolve) => {
-          toast.success('Books have been checked out', {
-            onClose: resolve,
-          });
-        });
-      }
-    } catch (error) {
-      console.error('Error checking out: ' + error);
-    }
+    setCardIDPopup(true);
+    setCheckoutOption('cart');
   };
 
-  const handleIDPopup = async () => {
+  const handleIDPopup = async (cardID: string, isbn2 = '') => {
     setCardIDPopup(false);
+    setValidCardID(cardID);
+    if(checkoutOption === 'quick'){
+      try{
+        if(await getNumCheckedOut(cardID) > 2){
+          toast.error("Too many books checked out")
+        }else{
+          const response = await fetch(
+            `/book-loans/checkout/${quickChecoutISBN},${cardID}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            },
+          );
+          if(response.ok){
+            console.log('Book checked out');
+            setCheckedOut((prev) => ({ ...prev, [quickChecoutISBN]: false }));
+          }else{
+            toast.error('Book already checked out / not found');
+          }
+          await handleSearch();
+          await new Promise((resolve) => {
+            toast.success('Book has been checked out', {
+              onClose: resolve,
+            });
+          });
+        }
+      }catch{
+  
+      };
+    }else if(checkoutOption === 'cart'){
+      try {
+        const checkedOutBooks = Object.keys(checkedOut).filter((isbn) => checkedOut[isbn]);
+        if (checkedOutBooks.length === 0) {
+          toast.warning('No books selected');
+          return;
+        } else if ((await getNumCheckedOut(cardID)) + checkedOutBooks.length > 3) {
+          toast.error('Too many books checked out');
+          return;
+        } else {
+          await Promise.all(
+            checkedOutBooks.map(async (isbn) => {
+              const response = await fetch(
+                `/book-loans/checkout/${isbn},${cardID}`,
+                {
+                  method: 'PUT',
+                },
+              );
+  
+              if (response.ok) {
+                console.log('Book checked out');
+                setCheckedOut((prev) => ({ ...prev, [isbn]: false }));
+              } else {
+                console.error('Error checking out book');
+              }
+            }),
+          );
+          await handleSearch();
+          await new Promise((resolve) => {
+            toast.success('Books have been checked out', {
+              onClose: resolve,
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error checking out: ' + error);
+      }
+    }
   };
 
   // const handleCheckout = async () => {
@@ -226,9 +263,10 @@ export function Search() {
   //   }
   // };
 
-  const getNumCheckedOut = async () => {
+  const getNumCheckedOut = async (cardID: string) => {
     try {
-      const response = await fetch(`/book-loans/getNumLoans/${localStorage.getItem('key')}`);
+      console.log(cardID);
+      const response = await fetch(`/book-loans/getNumLoans/${cardID}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Books checked out: ' + data);
@@ -245,10 +283,10 @@ export function Search() {
 
   const handleCheckoutbyISBN = async () => {
     try {
-      if ((await getNumCheckedOut()) > 2) {
-        toast.error('Too many books checked out');
-        return;
-      } else {
+      // if ((await getNumCheckedOut()) > 2) {
+      //   toast.error('Too many books checked out');
+      //   return;
+      // } else {
         const response = await fetch(
           `/book-loans/checkout/${isbnSearch},${localStorage.getItem('key')}`,
           {
@@ -266,7 +304,7 @@ export function Search() {
           console.error('Error checking out book');
           toast.error('Book already checked out / not found');
         }
-      }
+      // }
     } catch (error) {
       console.error('Error checking out: ' + error);
     }
@@ -306,8 +344,10 @@ export function Search() {
 
   const checkoutErrors = async (isbn: string) => {};
 
-  const handleQuickCheckout = async () => {
+  const handleQuickCheckout = async (isbn: string) => {
     setCardIDPopup(true);
+    setCheckoutOption('quick');
+    setQuickCheckoutISBN(isbn);
   };
 
   const indexOfLastItem = pageNumber * itemsPerPage;
@@ -317,7 +357,7 @@ export function Search() {
   return (
     <>
       <ToastContainer />
-      {cardIDPopup && <CardIDPrompt onClickFunction={handleIDPopup} triggerToast={triggerToast}/>}
+      {cardIDPopup && <CardIDPrompt onClickFunction={handleIDPopup} triggerToast={triggerToast} />}
       <SearchBar
         onSearch={handleSearch}
         setSearchTerm={setSearchTermWithEffect}
@@ -328,7 +368,7 @@ export function Search() {
           <span className="visually-hidden">Loading...</span>
         </Spinner>
       )}
-      <Container className="mt-5">
+      <Container className="mt-4 p-0">
         {currentItems.map((result, index) => (
           <Card key={index} className="p-3 my-4">
             <div className="d-flex align-items-start">
@@ -370,7 +410,7 @@ export function Search() {
                 </Card.Text>
                 {!result.available ? (
                   <>
-                    <Button className="me-2" onClick={() => handleQuickCheckout()}>
+                    <Button className="me-2" onClick={() => handleQuickCheckout(result.isbn)}>
                       Quick Checkout
                     </Button>
                     <ToggleButton
@@ -404,25 +444,27 @@ export function Search() {
             </Button>
           </div>
         ) : (
-          <div className="w-100 d-flex align-items-center justify-content-center">
-            <Form className="d-flex">
-              <Form.Control
-                type="search"
-                placeholder="ISBN"
-                className="me-2 rounded-pill mt-2 mb-4"
-                aria-label="Search"
-                value={isbnSearch}
-                onChange={(e) => setIsbnSearch(e.target.value)}
-              />
-              <Button
-                className="mx-3 mt-2 mb-4 rounded-pill"
-                onClick={handleCheckoutbyISBN}
-                variant="success"
-              >
-                Checkout By ISBN
-              </Button>
-            </Form>
-          </div>
+          <Row>
+            <Col sm={12}>
+              <Form className="d-flex mt-2">
+                <Form.Control
+                  type="search"
+                  placeholder="Checkout by ISBN..."
+                  className="me-2 rounded-pill"
+                  aria-label="Search"
+                  value={isbnSearch}
+                  onChange={(e) => setIsbnSearch(e.target.value)}
+                />
+                <Button
+                  className="rounded-pill"
+                  onClick={handleCheckoutbyISBN}
+                  variant="outline-success"
+                >
+                  Submit
+                </Button>
+              </Form>
+            </Col>
+          </Row>
         )}
       </Container>
     </>

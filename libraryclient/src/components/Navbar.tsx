@@ -13,6 +13,7 @@ export function Navbar(){
                     <Nav.Link href="/search">Search</Nav.Link>
                     <Nav.Link href="/fines">Fines</Nav.Link>
                     <Nav.Link href="/Borrower">Borrower</Nav.Link>
+                    <Nav.Link href="/signup">Register</Nav.Link>
                 </Nav>
             </Container>
         </ReactNavBar>

@@ -41,6 +41,11 @@ public class BookLoanController {
         return bookLoanService.loanIDofBL(ISBN, Card_id);
     }
 
+    @GetMapping("/getLoanIdAll/{ISBN}")
+    public Integer getLoanId(@PathVariable String ISBN) {
+        return bookLoanService.loanIDofBLAll(ISBN);
+    }
+
     // @GetMapping("/getLoanIdUnique/{ISBN},{Card_id},{author}")
     // public Integer getLoanIdUnique(@PathVariable String ISBN, @PathVariable int Card_id, @PathVariable String author) {
     //     return bookLoanService.loanIDofBLUnique(ISBN, Card_id, author);
@@ -109,7 +114,7 @@ public class BookLoanController {
     @GetMapping("/isBookAvailable/{ISBN}")
     public boolean isBookAvailable(@PathVariable String ISBN){
         if (bookServiceImp.bookExists(ISBN)) {
-            if(!bookLoanService.isBookAvailable(ISBN)) {
+            if(bookLoanService.isBookAvailable(ISBN)) {
                 return true;
             }
         }

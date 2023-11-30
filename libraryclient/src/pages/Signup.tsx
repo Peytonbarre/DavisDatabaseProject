@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Container, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 export function Signup() {
   const navigate = useNavigate();
@@ -43,19 +44,33 @@ export function Signup() {
     e.preventDefault();
     try {
       // TODO: Change when proxy
-      const response = await fetch('/borrower-sign-up', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        console.log('signup success');
-        navigate(`/login?bname=${formData.bname}&ssn=${formData.ssn}`);
-      } else {
-        console.log('signup failed');
+      const ssnSearch = await fetch(`/checkSSN/${formData.ssn}`);
+      if(ssnSearch.ok){
+        const ssnData = await ssnSearch.json();
+        if(!ssnData){
+          toast.error('User with SSN already exists');
+        }else{
+          const response = await fetch('/borrower-sign-up', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+    
+          if (response.ok) {
+            console.log('signup success');
+            const cardIDResponse = await fetch(`/borrowerLogin/${formData.bname},${formData.ssn}`);
+            if(cardIDResponse.ok){
+              const cardIDData = await cardIDResponse.json();
+              toast.success('Borrower added with CardID: ' + cardIDData);
+            }
+          } else {
+            toast.error('Signup Failed!')
+          }
+        }
+      }else{
+        toast.error('error fetching ssn');
       }
     } catch (error) {
       console.error('signup error: ' + error);
@@ -63,59 +78,62 @@ export function Signup() {
   };
 
   return (
-    <Container className="d-flex align-items-center justify-content-center vh-100">
-      <Card className="align-items-center mb-5" style={{ width: '20rem', borderRadius: '20px' }}>
-        <h2 className="mb-5 mt-5 text-left" style={{ fontWeight: '700' }}>
-          Sign Up
-        </h2>
-        <Form>
-          <Form.Group className="mb-3" controlId="formUsername">
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="John Doe"
-              name="bname"
-              value={formData.bname}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formAddress">
-            <Form.Label>Address</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="800 W. Campbell Road"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formSSN">
-            <Form.Label>SSN</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="111-11-1111"
-              name="ssn"
-              value={formData.ssn}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formSSN">
-            <Form.Label>Phone Number</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="111-111-1111"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-            />
-          </Form.Group>
-          <div className="d-grid gap-2 mb-5 mt-5">
-            <Button onClick={handleSignup} variant="primary" type="submit">
-              Sign Up!
-            </Button>
-          </div>
-        </Form>
-      </Card>
-    </Container>
+    <>
+      <ToastContainer/>
+      <Container className="d-flex align-items-center justify-content-center h-100 mt-5">
+        <Card className="align-items-center mb-5 mt-5" style={{ width: '20rem', borderRadius: '20px' }}>
+          <h2 className="mb-5 mt-5 text-left" style={{ fontWeight: '700' }}>
+            Registration
+          </h2>
+          <Form>
+            <Form.Group className="mb-3" controlId="formUsername">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="John Doe"
+                name="bname"
+                value={formData.bname}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formAddress">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="800 W. Campbell Road"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formSSN">
+              <Form.Label>SSN</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="111-11-1111"
+                name="ssn"
+                value={formData.ssn}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formSSN">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="111-111-1111"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <div className="d-grid gap-2 mb-5 mt-5">
+              <Button onClick={handleSignup} variant="primary" type="submit">
+                Register!
+              </Button>
+            </div>
+          </Form>
+        </Card>
+      </Container>
+    </>
   );
 }

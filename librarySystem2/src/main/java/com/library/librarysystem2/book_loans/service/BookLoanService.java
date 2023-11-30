@@ -57,6 +57,10 @@ public class BookLoanService {
         return bookLoanRepository.getLoanID(ISBN, Card_id);
     }
 
+    public Integer loanIDofBLAll(String ISBN) {
+        return bookLoanRepository.getLoanIDAll(ISBN);
+    }
+
     // public Integer loanIDofBLUnique(String ISBN, int Card_id, String author) {
     //     return bookLoanRepository.getLoanIDUnique(ISBN, Card_id, author);
     // }
