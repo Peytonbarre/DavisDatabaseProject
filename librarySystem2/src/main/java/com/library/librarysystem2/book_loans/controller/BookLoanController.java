@@ -114,7 +114,7 @@ public class BookLoanController {
     @GetMapping("/isBookAvailable/{ISBN}")
     public boolean isBookAvailable(@PathVariable String ISBN){
         if (bookServiceImp.bookExists(ISBN)) {
-            if(!bookLoanService.isBookAvailable(ISBN)) {
+            if(bookLoanService.isBookAvailable(ISBN)) {
                 return true;
             }
         }
