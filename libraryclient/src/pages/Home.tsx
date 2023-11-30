@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Container, Row, Card, Table, Button } from 'react-bootstrap';
+import { Col, Container, Row, Card, Table, Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import '../assets/cardStyling.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -22,31 +22,32 @@ export function Home() {
   const navigate = useNavigate();
   const [currentLoans, setCurrentLoans] = useState<CurrentLoans[]>([]);
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
+  const [cardID, setCardID] = useState('');
+  const [validCardID, setValidCardID] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('key') === '') {
-      navigate('/');
-    }
-
     fetchData();
     displayFines();
   }, []);
 
   const fetchData = async () => {
-    try {
-      const response = await fetch(`/book-loans/currentLoans/${localStorage.getItem('key')}`);
-      if (response.ok) {
-        const data: string[][] = await response.json();
-        console.log('Data from server:', data);
+    if (validCardID !== '') {
+      try {
+        const response = await fetch(`/book-loans/currentLoans/${validCardID}`);
+        if (response.ok) {
+          const data: string[][] = await response.json();
+          console.log('Data from server:', data);
 
-        const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
-        setCurrentLoans(uniqueLoanList);
-        updateFines(uniqueLoanList);
-      } else {
-        console.error('Error getting current loans response');
+          const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
+          setCurrentLoans(uniqueLoanList);
+          updateFines(uniqueLoanList);
+        } else {
+          console.error('Error getting current loans response');
+        }
+      } catch (error) {
+        console.error('Error fetching current loans: ' + error);
       }
-    } catch (error) {
-      console.error('Error fetching current loans: ' + error);
+    } else {
     }
   };
 
@@ -63,60 +64,64 @@ export function Home() {
   };
 
   const handleCheckIn = async (loan: CurrentLoans) => {
-    try {
-      const loanIDRequest = await fetch(
-        `/book-loans/getLoanId/${loan.isbn},${localStorage.getItem('key')}`,
-      );
-      if (loanIDRequest.ok) {
-        const loanID = await loanIDRequest.json();
-        const response = await fetch(`/book-loans/checkInBook/${loan.isbn},${loanID},0`, {
-          method: 'PUT',
-        });
-        if (response.ok) {
-          toast.success('Book checked in');
-          window.location.reload();
+    if (validCardID !== '') {
+      try {
+        const loanIDRequest = await fetch(`/book-loans/getLoanId/${loan.isbn},${validCardID}`);
+        if (loanIDRequest.ok) {
+          const loanID = await loanIDRequest.json();
+          const response = await fetch(`/book-loans/checkInBook/${loan.isbn},${loanID},0`, {
+            method: 'PUT',
+          });
+          if (response.ok) {
+            toast.success('Book checked in');
+            window.location.reload();
+          } else {
+            console.error('Error checking in book');
+          }
         } else {
-          console.error('Error checking in book');
+          console.error('Problem getting loan ID');
         }
-      } else {
-        console.error('Problem getting loan ID');
+      } catch (error) {
+        console.error('Error getting loanID: ' + error);
       }
-    } catch (error) {
-      console.error('Error getting loanID: ' + error);
+    } else {
     }
   };
 
   const displayFines = async () => {
-    try {
-      const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
-      if (response.ok) {
-        const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
-          await response.json();
-        const finesArray: CurrentFines[] = (
-          await Promise.all(
-            finedata.map(async (fine) => {
-              console.log(fine);
-              const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
-              const loanData: string[][] = await loanResponse.json();
-              if (loanResponse.ok) {
-                const date = new Date(loanData[0][1]);
-                const currentDate = new Date();
-                const timeDifference = new Date(Math.abs(date.getTime() - currentDate.getTime()));
-                const timeDifference2 = timeDifference.getDate() - 1;
-                return {
-                  title: loanData[0][0],
-                  days_late: String(timeDifference2),
-                  fineAmt: loanData[0][2],
-                };
-              }
-              return null;
-            }),
-          )
-        ).filter((fine): fine is CurrentFines => fine !== null);
-        setCurrentFines(finesArray);
+    if (validCardID !== '') {
+      try {
+        const response = await fetch(`/fines/activeFines/${validCardID}`);
+        if (response.ok) {
+          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
+            await response.json();
+          const finesArray: CurrentFines[] = (
+            await Promise.all(
+              finedata.map(async (fine) => {
+                console.log(fine);
+                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+                const loanData: string[][] = await loanResponse.json();
+                if (loanResponse.ok) {
+                  const date = new Date(loanData[0][1]);
+                  const currentDate = new Date();
+                  const timeDifference = new Date(Math.abs(date.getTime() - currentDate.getTime()));
+                  const timeDifference2 = timeDifference.getDate() - 1;
+                  return {
+                    title: loanData[0][0],
+                    days_late: String(timeDifference2),
+                    fineAmt: loanData[0][2],
+                  };
+                }
+                return null;
+              }),
+            )
+          ).filter((fine): fine is CurrentFines => fine !== null);
+          setCurrentFines(finesArray);
+        }
+      } catch (error) {
+        console.error('Error displaying fines: ' + error);
       }
-    } catch (error) {
-      console.error('Error displaying fines: ' + error);
+    } else {
     }
   };
 
@@ -134,7 +139,7 @@ export function Home() {
 
   const getLoanID = async (isbn: string) => {
     try {
-      const response = await fetch(`/book-loans/getLoanId/${isbn},${localStorage.getItem('key')}`);
+      const response = await fetch(`/book-loans/getLoanId/${isbn},${validCardID}`);
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -148,6 +153,32 @@ export function Home() {
     }
   };
 
+  const handleCardIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCardID(event.target.value);
+  };
+
+  const handleSubmitCardID = async () => {
+    try {
+      const response = await fetch(`/checkingID/${cardID}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        if (data) {
+          toast.success('User info displayed');
+          setValidCardID(cardID);
+          fetchData();
+          displayFines();
+        } else {
+          toast.error('User not found');
+        }
+      } else {
+        console.log('Error getting the response');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <ToastContainer />
@@ -155,6 +186,27 @@ export function Home() {
         <Row>
           <Col sm={12} className="mt-2">
             <h2>Dashboard</h2>
+          </Col>
+        </Row>
+        <Row className='mt-3'>
+          <Col sm={12}>
+            <Form className="d-flex">
+              <Form.Control
+                type="search"
+                placeholder="Filter by CardID..."
+                className="me-2 rounded-pill"
+                aria-label="Search"
+                value={cardID}
+                onChange={handleCardIDChange}
+              />
+              <Button
+                className="rounded-pill"
+                variant="outline-primary"
+                onClick={handleSubmitCardID}
+              >
+                Filter
+              </Button>
+            </Form>
           </Col>
         </Row>
         {/* <SearchBar onSearch={handleSearch} setSearchTerm={setSearchTerm}/> */}

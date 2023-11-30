@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
 
 interface CardIDPromptProps {
-  onClickFunction: () => void;
+  onClickFunction: (cardID: string) => void;
   triggerToast: () => void;
 }
 
@@ -22,7 +22,7 @@ export function CardIDPrompt({ onClickFunction, triggerToast }: CardIDPromptProp
         console.log(data);
         if (data) {
             setInvalidID(false);
-          onClickFunction();
+          onClickFunction(cardID);
           triggerToast();
         } else {
             setInvalidID(true);

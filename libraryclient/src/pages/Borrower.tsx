@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 interface Borrower {
   name: string;
@@ -10,25 +11,16 @@ interface Borrower {
 }
 
 export function Borrower() {
-  const navigate = useNavigate();
   const [userData, setUserData] = useState<Borrower>();
+  const [cardID, setCardID] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('key') === '') {
-      navigate('/');
-    }
 
-    getUserData();
   }, []);
-
-  const buttonHandler = () => {
-    localStorage.setItem('key', '');
-    navigate('/');
-  };
 
   const getUserData = async () => {
     try {
-      const response = await fetch(`/borrowerINFO/${localStorage.getItem('key')}`);
+      const response = await fetch(`/borrowerINFO/${cardID}`);
       if (response.ok) {
         const data = await response.json();
         const mappedData: Borrower = {
@@ -46,9 +38,48 @@ export function Borrower() {
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(`/checkingID/${cardID}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        if (data) {
+          toast.success("User info displayed")
+          getUserData()
+        } else {
+          toast.error("User not found")
+        }
+      } else {
+        console.log('Error getting the response');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCardID(event.target.value);
+  };
+
   return (
+    <>
+    <ToastContainer/>
     <div className="d-flex justify-content-center align-items-center mt-5">
       <Card className="align-items-center" style={{ width: '30rem' }}>
+      <Form className="d-flex mt-4">
+              <Form.Control
+                type="search"
+                placeholder="Enter CardID"
+                className="me-2 rounded-pill"
+                aria-label="Search"
+                value={cardID}
+                onChange={handleInput}
+              />
+              <Button className="rounded-pill" variant="outline-success" onClick={handleSubmit}>
+                Submit
+              </Button>
+            </Form>
         {/* <div style={{height: '200px', width: '200px', background: 'gray', borderRadius: '200px'}} className="my-5"></div> */}
         <img
           src={require('../assets/profilephoto.jpg')}
@@ -58,24 +89,22 @@ export function Borrower() {
             borderRadius: '200px',
             border: '5px solid gray',
           }}
-          className="mt-5 mb-4"
+          className="mt-4 mb-4"
         />
         <h2 className="mb-4 text-left" style={{ fontWeight: '700' }}>
           {userData?.name}
         </h2>
-        <h4 className="text-left" style={{ fontWeight: '400' }}>
-          Card-Id: {localStorage.getItem('key')}
-        </h4>
         <h5 className="text-left" style={{ fontWeight: '400' }}>
           Address: {userData?.address}
         </h5>
-        <h5 className="mb-4 text-left" style={{ fontWeight: '400' }}>
+        <h5 className="text-left" style={{ fontWeight: '400' }}>
           Phone: {userData?.phone}
         </h5>
-        <Button variant="danger" className="mb-5" onClick={buttonHandler}>
-          Sign Out
-        </Button>
+        <h5 className="mb-4 text-left" style={{ fontWeight: '400' }}>
+          Ssn: {userData?.ssn}
+        </h5>
       </Card>
     </div>
+    </>
   );
 }
