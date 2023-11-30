@@ -86,4 +86,8 @@ public class BookLoanService {
         return bookLoanRepository.getBookData(loan_id);
     }
 
+    public List<Book_Loans> everyActiveBookLoan() {
+        return bookLoanRepository.allActiveBookLoans();
+    }
+
 }

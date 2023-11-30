@@ -23,7 +23,7 @@ for line in book_list[0:]:
         else:
             author_id = authorid
             author_dict[auth] = authorid
-            f2.write(str("INSERT INTO Authors VALUES (\"" + str(authorid) + "\" , \"" + auth + "\");"))
+            f2.write(str("INSERT INTO Author VALUES (\"" + str(authorid) + "\" , \"" + auth + "\");"))
             f2.write("\n")
             f2.write(str("INSERT INTO Book_Authors VALUES (\"" + str(authorid) + "\" , \"" + isbn + "\");"))
             f2.write("\n")

@@ -43,6 +43,11 @@ public class LibraryServiceImp {
         }
     }
 
+    public boolean ssnIsInDB(String SSN) {
+        String ssnOfBorr = borrowerRepository.ssnInDB(SSN);
+        return ssnOfBorr == null;
+    }
+
     public Integer loginBorrower(String borrID, String fullName){
         Integer idOfBorrower = borrowerRepository.loginWithSSNandNAME(borrID, fullName);
         System.out.println("Search term - Username: " + fullName + ", Password: " + borrID);
