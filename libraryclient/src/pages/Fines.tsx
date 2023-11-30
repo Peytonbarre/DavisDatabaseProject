@@ -12,11 +12,10 @@ export function Fines() {
   const navigate = useNavigate();
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [validCardID, setValidCardID] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('key') === '') {
-      navigate('/');
-    }
+
     displayFines();
   }, [currentDate]);
 
@@ -34,35 +33,68 @@ export function Fines() {
 
   const displayFines = async () => {
     try {
-      const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
-      if (response.ok) {
-        const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
-          await response.json();
-        const finesArray: CurrentFines[] = (
-          await Promise.all(
-            finedata.map(async (fine) => {
-              console.log(fine);
-              const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
-              const loanData: string[][] = await loanResponse.json();
-              if (loanResponse.ok) {
-                const dueDate = new Date(loanData[0][1]);
-                const currentDateClone = new Date(currentDate);
-                const isOverdue = currentDateClone > dueDate;
-                const timeDifference = isOverdue
-                  ? getDaysDifference(dueDate, currentDateClone)
-                  : 0;
-                return {
-                  title: loanData[0][0],
-                  days_late: String(timeDifference-1),
-                  fineAmt: String(0.25*(timeDifference-1)),
-                  // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
-                };
-              }
-              return null;
-            }),
-          )
-        ).filter((fine): fine is CurrentFines => fine !== null);
-        setCurrentFines(finesArray);
+      if(validCardID !== ''){
+        const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
+        if (response.ok) {
+          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
+            await response.json();
+          const finesArray: CurrentFines[] = (
+            await Promise.all(
+              finedata.map(async (fine) => {
+                console.log(fine);
+                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+                const loanData: string[][] = await loanResponse.json();
+                if (loanResponse.ok) {
+                  const dueDate = new Date(loanData[0][1]);
+                  const currentDateClone = new Date(currentDate);
+                  const isOverdue = currentDateClone > dueDate;
+                  const timeDifference = isOverdue
+                    ? getDaysDifference(dueDate, currentDateClone)
+                    : 0;
+                  return {
+                    title: loanData[0][0],
+                    days_late: String(timeDifference-1),
+                    fineAmt: String(0.25*(timeDifference-1)),
+                    // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
+                  };
+                }
+                return null;
+              }),
+            )
+          ).filter((fine): fine is CurrentFines => fine !== null);
+          setCurrentFines(finesArray);
+        }
+      }else{
+        const response = await fetch(`/fines/activeFines`);
+        if (response.ok) {
+          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
+            await response.json();
+          const finesArray: CurrentFines[] = (
+            await Promise.all(
+              finedata.map(async (fine) => {
+                console.log(fine);
+                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+                const loanData: string[][] = await loanResponse.json();
+                if (loanResponse.ok) {
+                  const dueDate = new Date(loanData[0][1]);
+                  const currentDateClone = new Date(currentDate);
+                  const isOverdue = currentDateClone > dueDate;
+                  const timeDifference = isOverdue
+                    ? getDaysDifference(dueDate, currentDateClone)
+                    : 0;
+                  return {
+                    title: loanData[0][0],
+                    days_late: String(timeDifference-1),
+                    fineAmt: String(0.25*(timeDifference-1)),
+                    // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
+                  };
+                }
+                return null;
+              }),
+            )
+          ).filter((fine): fine is CurrentFines => fine !== null);
+          setCurrentFines(finesArray);
+        }
       }
     } catch (error) {
       console.error('Error displaying fines: ' + error);

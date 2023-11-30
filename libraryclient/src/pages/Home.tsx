@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Container, Row, Card, Table, Button, Form } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import '../assets/cardStyling.css';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import {
+  Col,
+  Container,
+  Row,
+  Card,
+  Table,
+  Button,
+  Form,
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import "../assets/cardStyling.css";
+import { ToastContainer, toast } from "react-toastify";
 
 interface CurrentLoans {
   title: string;
@@ -22,8 +30,8 @@ export function Home() {
   const navigate = useNavigate();
   const [currentLoans, setCurrentLoans] = useState<CurrentLoans[]>([]);
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
-  const [cardID, setCardID] = useState('');
-  const [validCardID, setValidCardID] = useState('');
+  const [cardID, setCardID] = useState("");
+  const [validCardID, setValidCardID] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -31,80 +39,138 @@ export function Home() {
   }, []);
 
   const fetchData = async () => {
-    if (validCardID !== '') {
+    if (validCardID !== "") {
       try {
         const response = await fetch(`/book-loans/currentLoans/${validCardID}`);
         if (response.ok) {
           const data: string[][] = await response.json();
-          console.log('Data from server:', data);
 
           const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
           setCurrentLoans(uniqueLoanList);
           updateFines(uniqueLoanList);
         } else {
-          console.error('Error getting current loans response');
+          console.error("Error getting current loans response");
         }
       } catch (error) {
-        console.error('Error fetching current loans: ' + error);
+        console.error("Error fetching current loans: " + error);
       }
     } else {
+      try {
+        const response = await fetch(`/book-loans/allActiveBookLoans`);
+        if (response.ok) {
+          const data: string[][] = await response.json();
+
+          const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
+
+          setCurrentLoans(uniqueLoanList);
+          updateFines(uniqueLoanList);
+        } else {
+          console.error("Error getting current loans response");
+        }
+      } catch (error) {
+        console.error("Error fetching current loans: " + error);
+      }
     }
   };
 
-  const filterUniqueBooks = (data: string[][]): CurrentLoans[] => {
+  const filterUniqueBooks = (data: any[]): CurrentLoans[] => {
     const uniqueBooks: Map<string, CurrentLoans> = new Map();
 
-    data.forEach(([isbn, title, author, date_in, date_out]) => {
-      if (!uniqueBooks.has(isbn)) {
-        uniqueBooks.set(isbn, { isbn, title, author, date_in, date_out });
-      }
-    });
-
+    if (validCardID !== "") {
+      console.log(data)
+      data.forEach(([isbn, title, author, date_in, date_out]) => {
+        if (!uniqueBooks.has(isbn)) {
+          uniqueBooks.set(isbn, { isbn, title, author, date_in, date_out });
+        }
+      });
+    } else {
+      data.forEach((loan) => {
+        // TODO, routes not sending back similar information (ALSO ADD CARDID)
+        console.log(data)
+        const { isbn, title, author, date_in, date_out } = loan;
+        if (!uniqueBooks.has(isbn)) {
+          uniqueBooks.set(isbn, { isbn, title, author, date_in, date_out });
+        }
+      });
+    }
     return Array.from(uniqueBooks.values());
   };
 
   const handleCheckIn = async (loan: CurrentLoans) => {
-    if (validCardID !== '') {
+    if (validCardID !== "") {
       try {
-        const loanIDRequest = await fetch(`/book-loans/getLoanId/${loan.isbn},${validCardID}`);
+        const loanIDRequest = await fetch(
+          `/book-loans/getLoanId/${loan.isbn},${validCardID}`
+        );
         if (loanIDRequest.ok) {
           const loanID = await loanIDRequest.json();
-          const response = await fetch(`/book-loans/checkInBook/${loan.isbn},${loanID},0`, {
-            method: 'PUT',
-          });
+          const response = await fetch(
+            `/book-loans/checkInBook/${loan.isbn},${loanID},0`,
+            {
+              method: "PUT",
+            }
+          );
           if (response.ok) {
-            toast.success('Book checked in');
+            toast.success("Book checked in");
             window.location.reload();
           } else {
-            console.error('Error checking in book');
+            console.error("Error checking in book");
           }
         } else {
-          console.error('Problem getting loan ID');
+          console.error("Problem getting loan ID");
         }
       } catch (error) {
-        console.error('Error getting loanID: ' + error);
+        console.error("Error getting loanID: " + error);
       }
     } else {
+      try {
+        const loanIDRequest = await fetch(`/book-loans/allActiveBookLoans`);
+        if (loanIDRequest.ok) {
+          const loanID = await loanIDRequest.json();
+          const response = await fetch(
+            `/book-loans/checkInBook/${loan.isbn},${loanID},0`,
+            {
+              method: "PUT",
+            }
+          );
+          if (response.ok) {
+            toast.success("Book checked in");
+            window.location.reload();
+          } else {
+            console.error("Error checking in book");
+          }
+        } else {
+          console.error("Problem getting loan ID");
+        }
+      } catch (error) {
+        console.error("Error getting loanID: " + error);
+      }
     }
   };
 
   const displayFines = async () => {
-    if (validCardID !== '') {
+    if (validCardID !== "") {
       try {
         const response = await fetch(`/fines/activeFines/${validCardID}`);
         if (response.ok) {
-          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
-            await response.json();
+          const finedata: {
+            paid: string;
+            fine_amt: string;
+            loan_id: string;
+          }[] = await response.json();
           const finesArray: CurrentFines[] = (
             await Promise.all(
               finedata.map(async (fine) => {
-                console.log(fine);
-                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+                const loanResponse = await fetch(
+                  `/book-loans/getBookData/${fine.loan_id}`
+                );
                 const loanData: string[][] = await loanResponse.json();
                 if (loanResponse.ok) {
                   const date = new Date(loanData[0][1]);
                   const currentDate = new Date();
-                  const timeDifference = new Date(Math.abs(date.getTime() - currentDate.getTime()));
+                  const timeDifference = new Date(
+                    Math.abs(date.getTime() - currentDate.getTime())
+                  );
                   const timeDifference2 = timeDifference.getDate() - 1;
                   return {
                     title: loanData[0][0],
@@ -113,15 +179,52 @@ export function Home() {
                   };
                 }
                 return null;
-              }),
+              })
             )
           ).filter((fine): fine is CurrentFines => fine !== null);
           setCurrentFines(finesArray);
         }
       } catch (error) {
-        console.error('Error displaying fines: ' + error);
+        console.error("Error displaying fines: " + error);
       }
     } else {
+      try {
+        const response = await fetch(`/fines/activeFines`);
+        if (response.ok) {
+          const finedata: {
+            paid: string;
+            fine_amt: string;
+            loan_id: string;
+          }[] = await response.json();
+          const finesArray: CurrentFines[] = (
+            await Promise.all(
+              finedata.map(async (fine) => {
+                const loanResponse = await fetch(
+                  `/book-loans/getBookData/${fine.loan_id}`
+                );
+                const loanData: string[][] = await loanResponse.json();
+                if (loanResponse.ok) {
+                  const date = new Date(loanData[0][1]);
+                  const currentDate = new Date();
+                  const timeDifference = new Date(
+                    Math.abs(date.getTime() - currentDate.getTime())
+                  );
+                  const timeDifference2 = timeDifference.getDate() - 1;
+                  return {
+                    title: loanData[0][0],
+                    days_late: String(timeDifference2),
+                    fineAmt: loanData[0][2],
+                  };
+                }
+                return null;
+              })
+            )
+          ).filter((fine): fine is CurrentFines => fine !== null);
+          setCurrentFines(finesArray);
+        }
+      } catch (error) {
+        console.error("Error displaying fines: " + error);
+      }
     }
   };
 
@@ -129,27 +232,43 @@ export function Home() {
     try {
       const reponse = data.map(async (loan) => {
         const loanID = await getLoanID(loan.isbn);
-        console.log(loanID);
-        const singleResponse = await fetch(`/fines/updateFines/${loanID}`, { method: 'PUT' });
+        const singleResponse = await fetch(`/fines/updateFines/${loanID}`, {
+          method: "PUT",
+        });
       });
     } catch (error) {
-      console.error('error updating fines: ' + error);
+      console.error("error updating fines: " + error);
     }
   };
 
   const getLoanID = async (isbn: string) => {
     try {
-      const response = await fetch(`/book-loans/getLoanId/${isbn},${validCardID}`);
-      if (response.ok) {
-        const data = await response.json();
-        return data;
+      if (validCardID !== "") {
+        const response = await fetch(
+          `/book-loans/getLoanId/${isbn},${validCardID}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          console.error("Error getting loanID response");
+          return "";
+        }
       } else {
-        console.error('Error getting loanID response');
-        return '';
+        const response = await fetch(
+          `/book-loans/getLoanIdAll/${isbn}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          console.error("Error getting loanID response");
+          return "";
+        }
       }
     } catch (error) {
-      console.error('error updating fines: ' + error);
-      return '';
+      console.error("error updating fines: " + error);
+      return "";
     }
   };
 
@@ -162,17 +281,16 @@ export function Home() {
       const response = await fetch(`/checkingID/${cardID}`);
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         if (data) {
-          toast.success('User info displayed');
+          toast.success("User info displayed");
           setValidCardID(cardID);
           fetchData();
           displayFines();
         } else {
-          toast.error('User not found');
+          toast.error("User not found");
         }
       } else {
-        console.log('Error getting the response');
+        console.log("Error getting the response");
       }
     } catch (error) {
       console.log(error);
@@ -188,7 +306,7 @@ export function Home() {
             <h2>Dashboard</h2>
           </Col>
         </Row>
-        <Row className='mt-3'>
+        <Row className="mt-3">
           <Col sm={12}>
             <Form className="d-flex">
               <Form.Control
@@ -274,14 +392,20 @@ export function Home() {
                     <Card.Img
                       variant="top"
                       src={`https://pictures.abebooks.com/isbn/${result.isbn}.jpg`}
-                      style={{ maxHeight: '200px', objectFit: 'cover', objectPosition: 'top' }}
+                      style={{
+                        maxHeight: "200px",
+                        objectFit: "cover",
+                        objectPosition: "top",
+                      }}
                     />
                     <Card.Body>
                       <Card.Title>{result.title}</Card.Title>
                       <Card.Subtitle>{result.author}</Card.Subtitle>
                       <Card.Text>{result.isbn}</Card.Text>
                       <div className="w-100 d-flex">
-                        <Button onClick={() => handleCheckIn(result)}>Check-In</Button>
+                        <Button onClick={() => handleCheckIn(result)}>
+                          Check-In
+                        </Button>
                       </div>
                     </Card.Body>
                   </Card>

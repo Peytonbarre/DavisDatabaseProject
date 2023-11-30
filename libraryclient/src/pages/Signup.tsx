@@ -44,23 +44,33 @@ export function Signup() {
     e.preventDefault();
     try {
       // TODO: Change when proxy
-      const response = await fetch('/borrower-sign-up', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        console.log('signup success');
-        const cardIDResponse = await fetch(`/borrowerLogin/${formData.bname},${formData.ssn}`);
-        if(cardIDResponse.ok){
-          const cardIDData = await cardIDResponse.json();
-          toast.success('Borrower added with CardID: ' + cardIDData);
+      const ssnSearch = await fetch(`/checkSSN/${formData.ssn}`);
+      if(ssnSearch.ok){
+        const ssnData = await ssnSearch.json();
+        if(!ssnData){
+          toast.error('User with SSN already exists');
+        }else{
+          const response = await fetch('/borrower-sign-up', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+    
+          if (response.ok) {
+            console.log('signup success');
+            const cardIDResponse = await fetch(`/borrowerLogin/${formData.bname},${formData.ssn}`);
+            if(cardIDResponse.ok){
+              const cardIDData = await cardIDResponse.json();
+              toast.success('Borrower added with CardID: ' + cardIDData);
+            }
+          } else {
+            toast.error('Signup Failed!')
+          }
         }
-      } else {
-        toast.error('Signup Failed!')
+      }else{
+        toast.error('error fetching ssn');
       }
     } catch (error) {
       console.error('signup error: ' + error);

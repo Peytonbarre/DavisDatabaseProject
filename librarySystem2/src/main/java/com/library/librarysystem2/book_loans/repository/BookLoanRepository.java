@@ -21,6 +21,9 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Card_id=:card_id and b.Date_in IS NULL")
     public Integer getLoanID(@Param("isbn") String ISBN, @Param("card_id") int Card_id);
 
+    @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Date_in IS NULL")
+    public Integer getLoanIDAll(@Param("isbn") String ISBN);
+
     // @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Card_id=:card_id")
     // public Integer getLoanIDUnique(String iSBN, int card_id, String author);
 
