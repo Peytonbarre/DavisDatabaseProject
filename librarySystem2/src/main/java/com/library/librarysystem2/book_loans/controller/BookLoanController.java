@@ -61,6 +61,9 @@ public class BookLoanController {
         return bookLoanService.currentBookLoans(Card_id);
     }
 
+    @GetMapping("/allActiveBookLoans")
+    public List<Object[]> allActiveBookLoans() { return bookLoanService.everyActiveBookLoan(); }
+
     @PutMapping("/checkout/{ISBN},{Card_id}")
     public ResponseEntity<String> checkoutBook(@PathVariable String ISBN, @PathVariable int Card_id){
         if (bookServiceImp.bookExists(ISBN)) {
@@ -125,7 +128,4 @@ public class BookLoanController {
     public int getNumLoans(@PathVariable int Card_id){
         return bookLoanService.numBooksCheckedOut(Card_id);
     }
-
-    @GetMapping("/allActiveBookLoans")
-    public List<Book_Loans> allActiveBookLoans() { return bookLoanService.everyActiveBookLoan(); }
 }

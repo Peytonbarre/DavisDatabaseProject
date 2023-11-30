@@ -74,6 +74,10 @@ public class BookLoanService {
         return bookLoanRepository.currentBookLoans(Card_id);
     }
 
+    public List<Object[]> everyActiveBookLoan() {
+        return bookLoanRepository.allActiveBookLoans();
+    }
+
     public String successMessage() {
         return ("Book has been checked out! Take a look at our other selections if you want to " +
                 "borrower another. Please be aware we only allow 3 books to be checked out at a time per " +
@@ -88,10 +92,6 @@ public class BookLoanService {
 
     public List<Object[]> getBookData(int loan_id) {
         return bookLoanRepository.getBookData(loan_id);
-    }
-
-    public List<Book_Loans> everyActiveBookLoan() {
-        return bookLoanRepository.allActiveBookLoans();
     }
 
 }

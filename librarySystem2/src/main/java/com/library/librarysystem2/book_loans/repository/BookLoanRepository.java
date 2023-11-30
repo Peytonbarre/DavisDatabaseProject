@@ -30,17 +30,17 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     @Query(value = "select b from Book_Loans as b inner join Borrower as bo on b.Card_id = bo.Card_id where (b.ISBN =:isbn and b.Date_in = null) or (b.Card_id =:card_id and b.Date_in = null) or (bo.bname like %:bname% and b.Date_in = null)")
     public List<Book_Loans> activeBookLoans(@Param("isbn") String ISBN, @Param("card_id") int Card_id, @Param("bname") String bname);
 
-    @Query(value = "SELECT b.ISBN, b.Title, a.name, bl.Date_out, bl.Due_date FROM Book_Loans bl INNER JOIN Book_Authors ba ON bl.ISBN = ba.ISBN INNER JOIN Authors a ON ba.AuthorID = a.AuthorID JOIN Book AS B ON BA.ISBN = B.ISBN  WHERE bl.Card_id = :card_id AND bl.Date_in IS NULL", nativeQuery = true)
+    @Query(value = "SELECT b.ISBN, b.Title, a.name, bl.Date_out, bl.Due_date FROM Book_Loans bl INNER JOIN Book_Authors ba ON bl.ISBN = ba.ISBN INNER JOIN author a ON ba.AuthorID = a.AuthorID JOIN Book AS B ON BA.ISBN = B.ISBN  WHERE bl.Card_id = :card_id AND bl.Date_in IS NULL", nativeQuery = true)
     public List<Object[]> currentBookLoans(@Param("card_id") int Card_id);
+
+    @Query(value = "SELECT b.ISBN, b.Title, a.name, bl.Date_out, bl.Due_date FROM Book_Loans bl INNER JOIN Book_Authors ba ON bl.ISBN = ba.ISBN INNER JOIN author a ON ba.AuthorID = a.AuthorID JOIN Book AS B ON BA.ISBN = B.ISBN  WHERE bl.Date_in IS NULL", nativeQuery = true)
+    public List<Object[]> allActiveBookLoans();
 
     @Query(value = "SELECT book.title, book_loans.Due_date, fines.Fine_amt FROM fines JOIN book_loans ON fines.Loan_id = book_loans.Loan_id JOIN book ON book_loans.ISBN = book.ISBN WHERE book_loans.Loan_id = :loan_id", nativeQuery = true)
     public List<Object[]> getBookData(@Param("loan_id") int Loan_id);
 
     // @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Card_id=:card_id group by b.isbn")
     // public Integer getLoanIDException(@Param("isbn") String ISBN, @Param("card_id") int Card_id);
-
-    @Query(value = "select b from Book_Loans as b where b.Date_in = null")
-    public List<Book_Loans> allActiveBookLoans();
 
 
 }

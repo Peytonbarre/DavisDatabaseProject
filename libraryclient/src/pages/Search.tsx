@@ -57,15 +57,18 @@ export function Search() {
         const data: string[] = await response.json();
         const books: Book[] = await Promise.all(
           data.map(async (bookInfo) => {
-            const [isbn, title, author] = bookInfo.split(',');
-            return { isbn, title, author, available: false };
+            const [isbn, title, author, available] = bookInfo.split(',');
+            if(available === '0'){
+              return { isbn, title, author, available: true };
+            }else{
+              return { isbn, title, author, available: false };
+            }
           }),
         );
         const uniqueBooks = books.filter(
           (book, index, self) => index === self.findIndex((b) => b.isbn === book.isbn),
         );
         setSearchResults(uniqueBooks);
-        await checkAvailabilitySpliced(uniqueBooks);
         setPageNumber(1);
       } else {
         const text = await response.text();
@@ -98,7 +101,6 @@ export function Search() {
       const response = await fetch(`/book-loans/isBookAvailable/${isbn}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Success!: ' + data);
         return data;
       } else {
         console.log('Possible error');
@@ -132,7 +134,6 @@ export function Search() {
       const currentItems = searchResults.slice(indexOfLastItem, indexOfLastItem + itemsPerPage);
       console.log(currentItems);
       console.log(pageNumber);
-      await checkAvailabilitySpliced(currentItems);
     }
   };
 
@@ -142,7 +143,6 @@ export function Search() {
       const currentItems = searchResults.slice(indexOfFirstItem - itemsPerPage, indexOfFirstItem);
       console.log(currentItems);
       console.log(pageNumber);
-      await checkAvailabilitySpliced(currentItems);
     }
   };
 
@@ -408,7 +408,7 @@ export function Search() {
                 >
                   {result.isbn}
                 </Card.Text>
-                {!result.available ? (
+                {result.available ? (
                   <>
                     <Button className="me-2" onClick={() => handleQuickCheckout(result.isbn)}>
                       Quick Checkout

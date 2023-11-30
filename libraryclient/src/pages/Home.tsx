@@ -7,6 +7,7 @@ import {
   Table,
   Button,
   Form,
+  ToggleButton
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../assets/cardStyling.css";
@@ -29,6 +30,7 @@ interface CurrentFines {
 export function Home() {
   const navigate = useNavigate();
   const [currentLoans, setCurrentLoans] = useState<CurrentLoans[]>([]);
+  const [checkedIn, setCheckedIn] = useState<{ [isbn: string]: boolean }>({});
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
   const [cardID, setCardID] = useState("");
   const [validCardID, setValidCardID] = useState("");
@@ -44,7 +46,6 @@ export function Home() {
         const response = await fetch(`/book-loans/currentLoans/${validCardID}`);
         if (response.ok) {
           const data: string[][] = await response.json();
-
           const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
           setCurrentLoans(uniqueLoanList);
           updateFines(uniqueLoanList);
@@ -59,9 +60,7 @@ export function Home() {
         const response = await fetch(`/book-loans/allActiveBookLoans`);
         if (response.ok) {
           const data: string[][] = await response.json();
-
           const uniqueLoanList: CurrentLoans[] = filterUniqueBooks(data);
-
           setCurrentLoans(uniqueLoanList);
           updateFines(uniqueLoanList);
         } else {
@@ -73,26 +72,19 @@ export function Home() {
     }
   };
 
-  const filterUniqueBooks = (data: any[]): CurrentLoans[] => {
+  const filterUniqueBooks = (data: string[][]): CurrentLoans[] => {
     const uniqueBooks: Map<string, CurrentLoans> = new Map();
-
-    if (validCardID !== "") {
-      console.log(data)
-      data.forEach(([isbn, title, author, date_in, date_out]) => {
-        if (!uniqueBooks.has(isbn)) {
-          uniqueBooks.set(isbn, { isbn, title, author, date_in, date_out });
-        }
-      });
-    } else {
-      data.forEach((loan) => {
-        // TODO, routes not sending back similar information (ALSO ADD CARDID)
-        console.log(data)
-        const { isbn, title, author, date_in, date_out } = loan;
-        if (!uniqueBooks.has(isbn)) {
-          uniqueBooks.set(isbn, { isbn, title, author, date_in, date_out });
-        }
-      });
-    }
+    data.forEach(([isbn, title, author, date_in, date_out]) => {
+      if (!uniqueBooks.has(isbn)) {
+        uniqueBooks.set(isbn, {
+          isbn,
+          title,
+          author,
+          date_in,
+          date_out,
+        });
+      }
+    });
     return Array.from(uniqueBooks.values());
   };
 
@@ -128,7 +120,7 @@ export function Home() {
         if (loanIDRequest.ok) {
           const loanID = await loanIDRequest.json();
           const response = await fetch(
-            `/book-loans/checkInBook/${loan.isbn},${loanID},0`,
+            `/book-loans/checkInBook/${loan.isbn},${loanID},125`,
             {
               method: "PUT",
             }
@@ -297,6 +289,49 @@ export function Home() {
     }
   };
 
+  const handleAddToCart = (isbn: string) => {
+    setCheckedIn((prev) => ({ ...prev, [isbn]: !prev[isbn] }));
+  };
+
+  const handleCheckInButton = async () => {
+    try {
+      const checkedInBooks = Object.keys(checkedIn).filter((isbn) => checkedIn[isbn]);
+      if (checkedInBooks.length === 0) {
+        toast.warning('No books selected');
+        return;
+      } else {
+        await Promise.all(
+          checkedInBooks.map(async (isbn) => {
+            const loanIDResponse = await fetch(`/book-loans/getLoanIdAll/${isbn}`)
+            if(loanIDResponse.ok){
+              const loanID = await loanIDResponse.json();
+              const response = await fetch(
+                `/book-loans/checkInBook/${isbn},${loanID}`,
+                {
+                  method: 'PUT',
+                },
+              );
+              if (response.ok) {
+                setCheckedIn((prev) => ({ ...prev, [isbn]: false }));
+              } else {
+                console.error('Error checking out book');
+              }
+            }
+          }),
+        );
+        await fetchData();
+        await displayFines();
+        await new Promise((resolve) => {
+          toast.success('Books have been checked in', {
+            onClose: resolve,
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error checking out: ' + error);
+    }
+  }
+
   return (
     <>
       <ToastContainer />
@@ -382,8 +417,13 @@ export function Home() {
 
         <Card className="mt-4">
           <Card.Body>
-            <Row>
-              <h3>Current Book Loans</h3>
+            <Row className="mb-3">
+              <Col md='auto'>
+                <h3>Current Book Loans</h3>
+              </Col>
+              <Col>
+                <Button variant="success" onClick={handleCheckInButton}>Check-In Cart</Button>
+              </Col>
             </Row>
             <Row md={2} xs={1} lg={3} className="g-3">
               {currentLoans.map((result, index) => (
@@ -403,9 +443,19 @@ export function Home() {
                       <Card.Subtitle>{result.author}</Card.Subtitle>
                       <Card.Text>{result.isbn}</Card.Text>
                       <div className="w-100 d-flex">
-                        <Button onClick={() => handleCheckIn(result)}>
+                        <Button className='me-3' onClick={() => handleCheckIn(result)}>
                           Check-In
                         </Button>
+                        <ToggleButton
+                          id={`toggle-check-${result.isbn}`}
+                          type="checkbox"
+                          variant="outline-success"
+                          value={checkedIn[result.isbn] ? '1' : (undefined as unknown as string)}
+                          checked={checkedIn[result.isbn]}
+                          onChange={() => handleAddToCart(result.isbn)}
+                        >
+                          {checkedIn[result.isbn] ? 'Added to Cart' : 'Add to Cart'}
+                        </ToggleButton>
                       </div>
                     </Card.Body>
                   </Card>
