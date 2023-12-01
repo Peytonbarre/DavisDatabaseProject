@@ -87,6 +87,30 @@ public class FinesService {
         finesRepository.save(fines);
     }
 
+    public void updateFine(int Loan_id, int updateAMT) {
+        Fines fines = finesRepository.getFinesByLoanID(Loan_id);
+        Book_Loans book_loans = bookLoanRepository.getBookLoanByLoanID(Loan_id);
+
+
+        if (fines.getPaid() == 0 && book_loans.getDate_in() == null) {
+            // if book is overdue
+            if (book_loans.getDue_date() != null && Date.valueOf(LocalDate.now()).compareTo(book_loans.getDue_date()) > 0 ) {
+                double fineRate = updateAMT/100.0;
+                double currentFineAmt = fines.getFine_amt();
+                System.out.println("Old fine amount: " + currentFineAmt);
+                if (currentFineAmt == fineRate) {
+                    currentFineAmt += fineRate;
+                    fines.setFine_amt(currentFineAmt);
+                } else {
+                    double updatedFineAmt = currentFineAmt + fineRate;
+                    System.out.println("New fine amount: " + updatedFineAmt);
+                    fines.setFine_amt(updatedFineAmt);
+                }
+            }
+        }
+        finesRepository.save(fines);
+    }
+
     public double testUpdateFines(int Loan_id) {
         return finesRepository.testingFineUpdate(Loan_id);
     }
