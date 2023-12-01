@@ -68,7 +68,7 @@ public class FinesController {
     }
 
     @GetMapping("/activeFines")
-    public List<Fines> allActiveFines() {
+    public List<Object[]> allActiveFines() {
         return finesService.displayAllActiveFines();
     }
 

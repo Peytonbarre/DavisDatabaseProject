@@ -3,8 +3,14 @@ import { Button, Card, Row, Col, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 interface CurrentFines {
+  card_id: string;
   title: string;
   days_late: string;
+  fineAmt: string;
+}
+
+interface BorrowerFine {
+  card_id: string;
   fineAmt: string;
 }
 
@@ -13,9 +19,9 @@ export function Fines() {
   const [currentFines, setCurrentFines] = useState<CurrentFines[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [validCardID, setValidCardID] = useState('');
+  const [borrowerFine, setBorrowerFine] = useState<BorrowerFine[]>([]);
 
   useEffect(() => {
-
     displayFines();
   }, [currentDate]);
 
@@ -33,16 +39,15 @@ export function Fines() {
 
   const displayFines = async () => {
     try {
-      if(validCardID !== ''){
+      if (validCardID !== '') {
         const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
         if (response.ok) {
-          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
-            await response.json();
+          const finedata: [string, string, string, string][] = await response.json();
           const finesArray: CurrentFines[] = (
             await Promise.all(
-              finedata.map(async (fine) => {
-                console.log(fine);
-                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+              finedata.map(async (fineData) => {
+                const [paid, loan_id, fine_amt, card_id] = fineData;
+                const loanResponse = await fetch(`/book-loans/getBookData/${loan_id}`);
                 const loanData: string[][] = await loanResponse.json();
                 if (loanResponse.ok) {
                   const dueDate = new Date(loanData[0][1]);
@@ -51,29 +56,31 @@ export function Fines() {
                   const timeDifference = isOverdue
                     ? getDaysDifference(dueDate, currentDateClone)
                     : 0;
+
                   return {
+                    card_id: card_id,
                     title: loanData[0][0],
-                    days_late: String(timeDifference-1),
-                    fineAmt: String(0.25*(timeDifference-1)),
-                    // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
+                    days_late: String(timeDifference - 1),
+                    fineAmt: String(0.25 * (timeDifference - 1)),
                   };
                 }
                 return null;
               }),
             )
           ).filter((fine): fine is CurrentFines => fine !== null);
+
           setCurrentFines(finesArray);
         }
-      }else{
+      } else {
         const response = await fetch(`/fines/activeFines`);
         if (response.ok) {
-          const finedata: { paid: string; fine_amt: string; loan_id: string }[] =
-            await response.json();
+          const finedata: [string, string, string, string][] = await response.json();
           const finesArray: CurrentFines[] = (
             await Promise.all(
-              finedata.map(async (fine) => {
-                console.log(fine);
-                const loanResponse = await fetch(`/book-loans/getBookData/${fine.loan_id}`);
+              finedata.map(async (fineData) => {
+                const [paid, loan_id, fine_amt, card_id] = fineData;
+                console.log('HERE' + loan_id);
+                const loanResponse = await fetch(`/book-loans/getBookData/${loan_id}`);
                 const loanData: string[][] = await loanResponse.json();
                 if (loanResponse.ok) {
                   const dueDate = new Date(loanData[0][1]);
@@ -82,11 +89,13 @@ export function Fines() {
                   const timeDifference = isOverdue
                     ? getDaysDifference(dueDate, currentDateClone)
                     : 0;
+
                   return {
+                    card_id: card_id,
                     title: loanData[0][0],
-                    days_late: String(timeDifference-1),
-                    fineAmt: String(0.25*(timeDifference-1)),
-                    // fineAmt: String(parseFloat(loanData[0][2] + 0.25*timeDifference)),
+                    days_late: String(timeDifference - 1),
+                    fineAmt: String(0.25 * (timeDifference - 1)),
+                    // fineAmt: String(parseFloat(loanData[0][2] + 0.25 * timeDifference)),
                   };
                 }
                 return null;
@@ -94,6 +103,7 @@ export function Fines() {
             )
           ).filter((fine): fine is CurrentFines => fine !== null);
           setCurrentFines(finesArray);
+          updateBorrower(finesArray);
         }
       }
     } catch (error) {
@@ -101,14 +111,42 @@ export function Fines() {
     }
   };
 
+  const updateBorrower = (finesArray: CurrentFines[]) => {
+    const summedFinesByCard: { [key: string]: number } = {};
+
+    finesArray.forEach((fine) => {
+      const { card_id, fineAmt } = fine;
+      const numericFineAmount = parseFloat(fineAmt);
+      if (!summedFinesByCard[card_id]) {
+        summedFinesByCard[card_id] = numericFineAmount;
+      } else {
+        summedFinesByCard[card_id] += numericFineAmount;
+      }
+    });
+    const fineSums: BorrowerFine[] = Object.keys(summedFinesByCard).map((card_id) => ({
+      card_id,
+      fineAmt: String(summedFinesByCard[card_id]),
+    }));
+    setBorrowerFine(fineSums);
+    console.log(borrowerFine);
+  };
+
   function getDaysDifference(date1: Date, date2: Date) {
-    const oneDay = 24 * 60 * 60 * 1000; 
+    const oneDay = 24 * 60 * 60 * 1000;
     const utcDate1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const utcDate2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
     const timeDifference = utcDate2 - utcDate1;
     const daysDifference = Math.floor(timeDifference / oneDay);
-  
+
     return daysDifference;
+  }
+
+  const payGroupFine = async (Loan_id: string, payment: string) => {
+    const response = await fetch(`/payFines/${Loan_id}, ${payment}`, {method: 'PUT'});
+    if(response.ok){
+      const data = await response.json();
+      console.log("PAYMENT: " + data);
+    }
   }
 
   return (
@@ -118,26 +156,40 @@ export function Fines() {
           <Row>
             <h3>Current Fines</h3>
           </Row>
-          <Row>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Days Late</th>
-                  <th>Total Fine</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentFines.map((fine, index) => (
-                  <tr key={index}>
-                    <td>{fine.title}</td>
-                    <td>{fine.days_late}</td>
-                    <td className="text-danger">${fine.fineAmt}</td>
+          {borrowerFine.map((borrower, index2) => (
+            <Row key={index2}>
+              <h4 className="p-0 mt-3">Borrower: {borrower.card_id}</h4>
+              <Table striped bordered hover className="mb-0">
+                <thead>
+                  <tr>
+                    <th>Card ID</th>
+                    <th>Title</th>
+                    <th>Days Late</th>
+                    <th>Total Fine</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Row>
+                </thead>
+                <tbody>
+                  {currentFines
+                    .filter((fine) => {
+                      console.log('Fine:', fine);
+                      console.log('Borrower ID:', borrower.card_id);
+                      return String(fine.card_id) === borrower.card_id;
+                    })
+                    .map((fine, index) => (
+                      <tr key={index}>
+                        <td>{fine.card_id}</td>
+                        <td>{fine.title}</td>
+                        <td>{fine.days_late}</td>
+                        <td className="text-danger">${fine.fineAmt}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </Table>
+              <Button className="mt-0 rounded-0" variant="outline-primary">
+                Pay Fines: ${borrower.fineAmt}
+              </Button>
+            </Row>
+          ))}
         </Card.Body>
       </Card>
       <div className="d-flex align-items-center justify-content-center mt-2">
