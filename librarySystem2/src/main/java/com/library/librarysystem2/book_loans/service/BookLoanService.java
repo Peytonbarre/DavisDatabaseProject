@@ -94,4 +94,8 @@ public class BookLoanService {
         return bookLoanRepository.getBookData(loan_id);
     }
 
+    public boolean isBookLoanCheckedIn(int Loan_id) {
+        return (!(bookLoanRepository.checkingBookLoan(Loan_id) == null));
+    }
+
 }

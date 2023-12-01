@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,5 +43,7 @@ public interface BookLoanRepository extends JpaRepository<Book_Loans, Integer> {
     // @Query(value = "select b.Loan_id from Book_Loans as b where b.ISBN=:isbn and b.Card_id=:card_id group by b.isbn")
     // public Integer getLoanIDException(@Param("isbn") String ISBN, @Param("card_id") int Card_id);
 
+    @Query(value = "select bl.Date_in from Book_Loans as bl where bl.Loan_id =:loan_id")
+    public Date checkingBookLoan(@Param("loan_id") int Loan_id);
 
 }
