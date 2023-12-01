@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Row, Col, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 interface CurrentFines {
   card_id: string;
   title: string;
   days_late: string;
   fineAmt: string;
+  loan_id: string;
 }
 
 interface BorrowerFine {
@@ -42,7 +44,7 @@ export function Fines() {
       if (validCardID !== '') {
         const response = await fetch(`/fines/activeFines/${localStorage.getItem('key')}`);
         if (response.ok) {
-          const finedata: [string, string, string, string][] = await response.json();
+          const finedata: [string, string, string, string, string][] = await response.json();
           const finesArray: CurrentFines[] = (
             await Promise.all(
               finedata.map(async (fineData) => {
@@ -59,9 +61,10 @@ export function Fines() {
 
                   return {
                     card_id: card_id,
+                    loan_id: loan_id,
                     title: loanData[0][0],
                     days_late: String(timeDifference - 1),
-                    fineAmt: String(0.25 * (timeDifference - 1)),
+                    fineAmt: String(fine_amt+ 0.25 * (timeDifference - 1)),
                   };
                 }
                 return null;
@@ -74,7 +77,7 @@ export function Fines() {
       } else {
         const response = await fetch(`/fines/activeFines`);
         if (response.ok) {
-          const finedata: [string, string, string, string][] = await response.json();
+          const finedata: [string, string, string, string, string][] = await response.json();
           const finesArray: CurrentFines[] = (
             await Promise.all(
               finedata.map(async (fineData) => {
@@ -89,12 +92,14 @@ export function Fines() {
                   const timeDifference = isOverdue
                     ? getDaysDifference(dueDate, currentDateClone)
                     : 0;
-
+                  
+                  const updateFinesResponse = await fetch(`/fines/updateFine/${loan_id},${String(Math.round((0.25 * (timeDifference - 1))*100))}`,{method: 'PUT'});
                   return {
                     card_id: card_id,
+                    loan_id: loan_id,
                     title: loanData[0][0],
                     days_late: String(timeDifference - 1),
-                    fineAmt: String(0.25 * (timeDifference - 1)),
+                    fineAmt: String(fine_amt+ 0.25 * (timeDifference - 1)),
                     // fineAmt: String(parseFloat(loanData[0][2] + 0.25 * timeDifference)),
                   };
                 }
@@ -141,16 +146,29 @@ export function Fines() {
     return daysDifference;
   }
 
-  const payGroupFine = async (Loan_id: string, payment: string) => {
-    const response = await fetch(`/payFines/${Loan_id}, ${payment}`, {method: 'PUT'});
-    if(response.ok){
-      const data = await response.json();
-      console.log("PAYMENT: " + data);
-    }
+  const payGroupFine = async (fines: CurrentFines[], borrower: BorrowerFine) => {
+    fines.forEach(async (fine) => {
+      if(borrower.card_id === String(fine.card_id)){
+        try{
+          const response = await fetch(`/fines/payFines/${fine.loan_id},${parseFloat(fine.fineAmt)*100}`, {method: 'PUT'});
+          if(response.ok){
+            const data = await response.json();
+            console.log(data);
+            toast.success('Book with loanID ' + fine.loan_id + ' checked in')
+          }else{
+            toast.error('Book with loanID ' + fine.loan_id + ' not checked in')
+            console.log(response.statusText)
+          }
+        }catch(error){
+          console.log(error);
+        }
+      }
+    })
   }
 
   return (
     <div>
+      <ToastContainer/>
       <Card className="mt-4 px-3">
         <Card.Body>
           <Row>
@@ -162,7 +180,7 @@ export function Fines() {
               <Table striped bordered hover className="mb-0">
                 <thead>
                   <tr>
-                    <th>Card ID</th>
+                    <th>Loan ID</th>
                     <th>Title</th>
                     <th>Days Late</th>
                     <th>Total Fine</th>
@@ -177,7 +195,7 @@ export function Fines() {
                     })
                     .map((fine, index) => (
                       <tr key={index}>
-                        <td>{fine.card_id}</td>
+                        <td>{fine.loan_id}</td>
                         <td>{fine.title}</td>
                         <td>{fine.days_late}</td>
                         <td className="text-danger">${fine.fineAmt}</td>
@@ -185,7 +203,7 @@ export function Fines() {
                     ))}
                 </tbody>
               </Table>
-              <Button className="mt-0 rounded-0" variant="outline-primary">
+              <Button className="mt-0 rounded-0" variant="outline-primary" onClick={() => payGroupFine(currentFines, borrower)}>
                 Pay Fines: ${borrower.fineAmt}
               </Button>
             </Row>

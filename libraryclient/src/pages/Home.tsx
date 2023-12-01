@@ -116,11 +116,13 @@ export function Home() {
       }
     } else {
       try {
-        const loanIDRequest = await fetch(`/book-loans/allActiveBookLoans`);
+        const loanIDRequest = await fetch(
+          `/book-loans/getLoanIdAll/${loan.isbn}`
+        );
         if (loanIDRequest.ok) {
           const loanID = await loanIDRequest.json();
           const response = await fetch(
-            `/book-loans/checkInBook/${loan.isbn},${loanID},125`,
+            `/book-loans/checkInBook/${loan.isbn},${loanID}`,
             {
               method: "PUT",
             }

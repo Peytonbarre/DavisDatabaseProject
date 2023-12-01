@@ -40,7 +40,7 @@ public class FinesController {
         return ResponseEntity.status(500).body("An unexpected error occurred during fine update.");
     }
 
-    @PutMapping("/updateFine/{Loan_id}, {updateAMT}")
+    @PutMapping("/updateFine/{Loan_id},{updateAMT}")
     public ResponseEntity<String> updatingFines(@PathVariable int Loan_id, @PathVariable int updateAMT) {
         if (bookLoanRepository.getBookLoanByLoanID(Loan_id) != null) {
             finesService.updateFine(Loan_id, updateAMT);
@@ -64,8 +64,34 @@ public class FinesController {
         return finesService.displayOfActiveFinesFromCardID(Card_id);
     }
 
-    @PutMapping("/payFines/{Loan_id}, {payment}")
-    public ResponseEntity<String> payingFines(@PathVariable int Loan_id, @PathVariable int payment) {
+    @PutMapping("/payFines/{Loan_id},{payment}")
+    public ResponseEntity<String> payingFines(@PathVariable int Loan_id, @PathVariable double payment) {
+        if (bookLoanRepository.getBookLoanByLoanID(Loan_id) != null) {
+            if (!bookLoanService.isBookLoanCheckedIn(Loan_id)) {
+                String errorMessage = "The fine you are trying to make a payment on seems to be on a book that has not " +
+                        "been checked in yet. Be sure to check in your book, and then make a payment on your fine, if needed.";
+                return ResponseEntity.status(400).body(errorMessage);
+            }
+            finesService.updateFineForToday(Loan_id);
+            finesService.updateFineByPayment(Loan_id, payment);
+            if (!finesService.checkIfPaidFully(Loan_id)) {
+                String errorMessage = "Error updating fine, please make sure you provide the full amount due, no more, no less." +
+                        " You can simply enter the amount as a whole number, ex. if your fine = $1.25, please enter '125'.";
+                return ResponseEntity.status(400).body(errorMessage);
+            }
+            if (finesService.testUpdateFines(Loan_id) == 0) {
+                String successMessage = "Fine has been paid!";
+                return ResponseEntity.status(200).body(successMessage);
+            }
+        } else {
+            String errorMessage = "Error paying fine, please make sure the provided Loan_id is correct.";
+            return ResponseEntity.status(400).body(errorMessage);
+        }
+        return ResponseEntity.status(500).body("An unexpected error occurred during fine update.");
+    }
+
+    @PutMapping("/payFinesCard/{Loan_id}, {payment}")
+    public ResponseEntity<String> payingFinesCard(@PathVariable int Loan_id, @PathVariable int payment) {
         if (bookLoanRepository.getBookLoanByLoanID(Loan_id) != null) {
             if (!bookLoanService.isBookLoanCheckedIn(Loan_id)) {
                 String errorMessage = "The fine you are trying to make a payment on seems to be on a book that has not " +
